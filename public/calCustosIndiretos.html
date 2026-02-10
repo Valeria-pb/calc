@@ -127,14 +127,22 @@
         </div>
 
         <div id="campo-duracao-servico" class="hidden">
-            <label>Tempo de Duração (em HORAS):</label>
-            <input type="number" id="horaServico" placeholder="Ex: 40">
+            <label>Tempo de Duração Total (Soma dos Equipamentos):</label>
+            <input type="number" id="horaServico" placeholder="0" readonly style="background-color: #f0f0f0;">
         </div>
 
-        <div id="campo-duracao-projeto" class="hidden">
+        <!-- <div id="campo-duracao-projeto" class="hidden">
             <label>Tempo de Duração (em MESES):</label>
             <input type="number" id="mesesProjeto" placeholder="Ex: 12">
-        </div>
+            <input type="number" id="horasEquipamento" placeholder="0" readonly style="background-color: #f0f0f0;">
+        </div> -->
+        <div id="campo-duracao-projeto" class="hidden">
+        <label>Tempo de Duração do Projeto (em MESES):</label>
+        <input type="number" id="mesesProjeto" placeholder="Ex: 12">
+        
+        <label style="margin-top: 10px; font-size: 0.85rem; color: #666;">Total de horas de equipamentos (Soma):</label>
+        <input type="number" id="horaEquipamento" placeholder="0" readonly style="background-color: #f0f0f0;">
+    </div>
 
         <button class="btn-proximo" onclick="validarEGerar()">Gerar Relatório</button>
     </div>
@@ -996,7 +1004,15 @@ async function carregarFatoresDaPlanilha() {
 }
 window.onload = carregarFatoresDaPlanilha
 
-
+class ItemEquipamento {
+    constructor(equipOriginal) {
+        this.idUnico = 'equip_' + Date.now() + Math.floor(Math.random() * 1000);
+        this.nome = equipOriginal.nome;
+        this.lab = equipOriginal.lab;
+        this.valorOriginal = equipOriginal.valor;
+        this.horas = 0; // Campo que recebe o inteiro
+    }
+}
 
 
    function selecionarTipo(tipo) {
@@ -1080,6 +1096,27 @@ window.onload = carregarFatoresDaPlanilha
     });
 }
 
+    // function atualizarSelectEquipamentos() {
+    //     const selectEq = document.getElementById('selEquipamento');
+    //     selectEq.innerHTML = '<option value="">-- Selecione o Equipamento --</option>';
+
+    //     // Filtra equipamentos que pertencem a qualquer um dos labs que o usuário já adicionou
+    //     const disponiveis = listaGeralEquipamentos.filter(eq => 
+    //         laboratoriosSelecionados.some(lab => lab.id === eq.lab)
+    //     );
+
+    //     if (disponiveis.length === 0) {
+    //         selectEq.innerHTML = '<option value="">Nenhum equipamento vinculado aos labs selecionados</option>';
+    //     }
+
+    //     disponiveis.forEach(eq => {
+    //         let opt = document.createElement('option');
+    //         // Guardamos o índice original para não quebrar a lógica de adição
+    //         opt.value = listaGeralEquipamentos.indexOf(eq);
+    //         opt.text = `${eq.nome} (${eq.ano || 'N/A'})`;
+    //         selectEq.add(opt);
+    //     });
+    // }
 
     function adicionarEquipamento() {
         const select = document.getElementById('selEquipamento');
@@ -1090,23 +1127,157 @@ window.onload = carregarFatoresDaPlanilha
             return;
         }
 
-        const equip = listaGeralEquipamentos[index];
-        equipamentosSelecionados.push(equip);
+        // Cria um novo objeto da classe ItemEquipamento
+        const novoItem = new ItemEquipamento(listaGeralEquipamentos[index]);
+        equipamentosSelecionados.push(novoItem);
         
-        const containerLista = document.getElementById('area-selecionados');
-        const divLista = document.getElementById('listaEquipsWeb');
-        containerLista.classList.remove('hidden');
+        //const containerLista = document.getElementById('area-selecionados');
+        //const divLista = document.getElementById('listaEquipsWeb');
+        //containerLista.classList.remove('hidden');
         
-        const item = document.createElement('div');
-        item.className = 'equip-item';
-        item.innerHTML = `<span>${equip.nome} <small>(${equip.lab})</small></span>`;
-        divLista.appendChild(item);
+        //const item = document.createElement('div');
+        //item.className = 'equip-item';
+        //item.innerHTML = `<span>${equip.nome} <small>(${equip.lab})</small></span>`;
+        //divLista.appendChild(item);
 
         // item.innerHTML = `<span>${equip.nome}</span>`;
         // divLista.appendChild(item);
-
+        renderizarListaEquipamentos();
         select.value = "";
     }
+
+
+    function renderizarListaEquipamentos() {
+        const containerLista = document.getElementById('area-selecionados');
+        const divLista = document.getElementById('listaEquipsWeb');
+        
+        if (equipamentosSelecionados.length === 0) {
+            containerLista.classList.add('hidden');
+            return;
+        }
+
+        containerLista.classList.remove('hidden');
+        divLista.innerHTML = ""; // Limpa para reconstruir a lista atualizada
+
+        equipamentosSelecionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'equip-item';
+            div.style.padding = "10px";
+            div.style.marginBottom = "5px";
+            div.style.border = "1px solid #ddd";
+
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><strong>${item.nome}</strong> <small>(${item.lab})</small></span>
+                    <button onclick="removerEquipamento('${item.idUnico}')" 
+                            style="background: #dc3545; padding: 2px 8px; font-size: 0.7rem;">Excluir</button>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="display: inline; font-size: 0.8rem;">Horas de uso:</label>
+                    <input type="number" 
+                        value="${item.horas || ''}" 
+                        onchange="atualizarHoras('${item.idUnico}', this.value)"
+                        placeholder="0" 
+                        style="width: 70px; padding: 4px; margin-left: 5px;">
+                </div>
+            `;
+            divLista.appendChild(div);
+        });
+    }
+
+    function adicionarEquipamento() {
+    const select = document.getElementById('selEquipamento');
+    const index = select.value;
+    
+    if (index === "") {
+        alert("Selecione um equipamento!");
+        return;
+    }
+
+    // Cria um novo objeto da classe ItemEquipamento
+    const novoItem = new ItemEquipamento(listaGeralEquipamentos[index]);
+    equipamentosSelecionados.push(novoItem);
+    
+    renderizarListaEquipamentos();
+    select.value = "";
+}
+
+function renderizarListaEquipamentos() {
+    const containerLista = document.getElementById('area-selecionados');
+    const divLista = document.getElementById('listaEquipsWeb');
+    
+    if (equipamentosSelecionados.length === 0) {
+        containerLista.classList.add('hidden');
+        return;
+    }
+
+    containerLista.classList.remove('hidden');
+    divLista.innerHTML = ""; // Limpa para reconstruir a lista atualizada
+
+    equipamentosSelecionados.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'equip-item';
+        div.style.padding = "10px";
+        div.style.marginBottom = "5px";
+        div.style.border = "1px solid #ddd";
+
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span><strong>${item.nome}</strong> <small>(${item.lab})</small></span>
+                <button onclick="removerEquipamento('${item.idUnico}')" 
+                        style="background: #dc3545; padding: 2px 8px; font-size: 0.7rem;">Excluir</button>
+            </div>
+            <div style="margin-top: 8px;">
+                <label style="display: inline; font-size: 0.8rem;">Horas de uso:</label>
+                <input type="number" 
+                       value="${item.horas || ''}" 
+                       onchange="atualizarHoras('${item.idUnico}', this.value)"
+                       placeholder="0" 
+                       style="width: 70px; padding: 4px; margin-left: 5px;">
+            </div>
+        `;
+        divLista.appendChild(div);
+    });
+}
+
+// Função para ALTERAR dinamicamente o valor dentro do objeto na lista
+function atualizarHoras(id, valor) {
+    const item = equipamentosSelecionados.find(e => e.idUnico === id);
+    if (item) {
+        item.horas = parseInt(valor) || 0;
+        // Sempre que mudar o valor de um item, recalcula o total
+        sincronizarSomaHoras(); 
+    }
+}
+
+// Função para EXCLUIR o item da lista
+function removerEquipamento(id) {
+    equipamentosSelecionados = equipamentosSelecionados.filter(e => e.idUnico !== id);
+    renderizarListaEquipamentos();
+    // Após remover, a soma deve diminuir automaticamente
+    sincronizarSomaHoras(); 
+}
+
+function sincronizarSomaHoras() {
+    // Soma as horas de todos os objetos da classe ItemEquipamento na lista
+    const somaTotal = equipamentosSelecionados.reduce((acc, item) => acc + (item.horas || 0), 0);
+    
+    // Localiza os inputs de ambas as calculadoras
+    const inputHoraServico = document.getElementById('horaServico');
+    const inputHoraEquipamentoProjeto = document.getElementById('horaEquipamento');
+    
+    // Atualiza o campo da aba de Serviços
+    if (inputHoraServico) {
+        inputHoraServico.value = somaTotal;
+    }
+    
+    // Atualiza o campo da aba de Projetos (Corrigido para id="horaEquipamento")
+    if (inputHoraEquipamentoProjeto) {
+        inputHoraEquipamentoProjeto.value = somaTotal;
+    }
+    
+    console.log("Sincronização em tempo real concluída: " + somaTotal + " horas totais.");
+}
 
     function validarEGerar() {
         const servidor = document.getElementById('nomeServidor').value.trim();
@@ -1147,8 +1318,7 @@ window.onload = carregarFatoresDaPlanilha
             
  
             duracaoTexto = horaServico + " horas";
-
-
+            
         } else {
 
             if (!projeto) { alert("O nome do Projeto é obrigatório!"); return; }
