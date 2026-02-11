@@ -181,6 +181,7 @@
     let tipoGlobal = "";
     let equipamentosSelecionados = [];
     let laboratoriosSelecionados = [];
+    let somaTotalEquip = 0;
 
     const listaGeralEquipamentos = [ 
         // Equipamentos do LAimage - Lab. de Imageamento p/ Micro e Nanoeletrônica 
@@ -1096,6 +1097,12 @@ class ItemEquipamento {
     });
 }
 
+function atualizarSomaEquipamentos() {
+    // Percorre a lista de objetos ItemEquipamento e soma a propriedade valorOriginal
+    somaTotalEquip = equipamentosSelecionados.reduce((acc, item) => acc + (item.valorOriginal || 0), 0);
+    
+    console.log("Valor total dos equipamentos utilizados: R$ " + somaTotalEquip.toFixed(2));
+}
     // function atualizarSelectEquipamentos() {
     //     const selectEq = document.getElementById('selEquipamento');
     //     selectEq.innerHTML = '<option value="">-- Selecione o Equipamento --</option>';
@@ -1143,6 +1150,7 @@ class ItemEquipamento {
         // item.innerHTML = `<span>${equip.nome}</span>`;
         // divLista.appendChild(item);
         renderizarListaEquipamentos();
+        atualizarSomaEquipamentos();
         select.value = "";
     }
 
@@ -1240,6 +1248,8 @@ function renderizarListaEquipamentos() {
     });
 }
 
+
+
 // Função para ALTERAR dinamicamente o valor dentro do objeto na lista
 function atualizarHoras(id, valor) {
     const item = equipamentosSelecionados.find(e => e.idUnico === id);
@@ -1256,11 +1266,12 @@ function removerEquipamento(id) {
     renderizarListaEquipamentos();
     // Após remover, a soma deve diminuir automaticamente
     sincronizarSomaHoras(); 
+    atualizarSomaEquipamentos();
 }
 
 function sincronizarSomaHoras() {
     // Soma as horas de todos os objetos da classe ItemEquipamento na lista
-    const somaTotal = equipamentosSelecionados.reduce((acc, item) => acc + (item.horas || 0), 0);
+    const somaTotalHoras = equipamentosSelecionados.reduce((acc, item) => acc + (item.horas || 0), 0);
     
     // Localiza os inputs de ambas as calculadoras
     const inputHoraServico = document.getElementById('horaServico');
@@ -1268,15 +1279,15 @@ function sincronizarSomaHoras() {
     
     // Atualiza o campo da aba de Serviços
     if (inputHoraServico) {
-        inputHoraServico.value = somaTotal;
+        inputHoraServico.value = somaTotalHoras;
     }
     
     // Atualiza o campo da aba de Projetos (Corrigido para id="horaEquipamento")
     if (inputHoraEquipamentoProjeto) {
-        inputHoraEquipamentoProjeto.value = somaTotal;
+        inputHoraEquipamentoProjeto.value = somaTotalHoras;
     }
     
-    console.log("Sincronização em tempo real concluída: " + somaTotal + " horas totais.");
+    console.log("Sincronização em tempo real concluída: " + somaTotalHoras + " horas totais.");
 }
 
     function validarEGerar() {
@@ -1315,14 +1326,15 @@ function sincronizarSomaHoras() {
             depPredial = areaTotalM2 * (depMensal/200) * horaServico;
             consPredial = areaTotalM2 * (consMensal/200) * horaServico;
             servicoSuprimentos = areaTotalM2 * (0.005*horaServico) * (1+fatoresPlanilha.percentual_areas_servi)* fatoresPlanilha.total_serv_supri/fatoresPlanilha.area_total_construida /12; 
+            depEquip= (1/fatoresPlanilha.vida_util_horas_equipamentos)* horaServico * somaTotalEquip
             
- 
             duracaoTexto = horaServico + " horas";
             
         } else {
 
             if (!projeto) { alert("O nome do Projeto é obrigatório!"); return; }
             const mesesProjeto = parseFloat(document.getElementById('mesesProjeto').value);
+            const totalHorasEquip = parseFloat(document.getElementById('horaEquipamento').value) || 0;
             if (isNaN(mesesProjeto) || mesesProjeto <= 0) { alert("Informe os meses!"); return; }
             
             
@@ -1333,7 +1345,8 @@ function sincronizarSomaHoras() {
 
             //usando a planilha para calcular serviço e suprimentos, multiplicando o valor por m2 e duração em meses
             servicoSuprimentos = areaTotalM2 * mesesProjeto * (1+fatoresPlanilha.percentual_areas_servi)* fatoresPlanilha.total_serv_supri/fatoresPlanilha.area_total_construida /12; 
-
+            
+            depEquip = (1 / fatoresPlanilha.vida_util_horas_equipamentos) * totalHorasEquip * somaTotalEquip;
 
             duracaoTexto = mesesProjeto + " meses";
         }
@@ -1365,6 +1378,8 @@ function sincronizarSomaHoras() {
         document.getElementById('res-dep').innerText = f(depPredial);
         document.getElementById('res-cons').innerText = f(consPredial);
         document.getElementById('res-suprimentos').innerText = f(servicoSuprimentos);
+        document.getElementById('res-dep-equip').innerText = f(depEquip);
+        document.getElementById('res-man-equip').innerText = f(manEquip);
         
         document.getElementById('data-geracao').innerText = new Date().toLocaleString('pt-BR');
         document.getElementById('res-projeto-linha').style.display = (tipoGlobal === 'projetos') ? 'block' : 'none';
