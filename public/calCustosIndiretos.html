@@ -1,901 +1,1265 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora de Custos Indiretos - CTI</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; color: #333; }
-        .container { max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { color: #004a80; text-align: center; font-size: 1.5rem; }
-        h3 { color: #004a80; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .question { margin: 20px 0; font-weight: bold; text-align: center; }
-        .options { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { padding: 12px; cursor: pointer; background-color: #004a80; color: white; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
-        .btn-inicio { width: 120px; } 
-        .btn-proximo { width: 100%; margin-top: 20px; }
-        .btn-add { background-color: #f39c12; margin-top: 5px; width: auto; padding: 8px 15px; font-size: 0.8rem; }
-        .btn-pdf { background-color: #28a745; margin-top: 20px; width: 100%; }
-        button:hover { opacity: 0.9; }
-        .hidden { display: none; }
-        #relatorio-final { margin-top: 20px; padding: 20px; background: #fff; border: 2px dashed #004a80; border-radius: 8px; }
-        .item-calculado { color: #004a80; font-size: 0.9rem; margin: 5px 0; }
-        .lista-selecionados { background: #f9f9f9; padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-top: 10px; font-size: 0.85rem; }
-        .equip-item { border-bottom: 1px solid #ddd; padding: 5px 0; display: flex; justify-content: space-between; }
-        @media print {
-            .no-print { display: none !important; }
-            .container { border: none; box-shadow: none; width: 100%; }
-            #relatorio-final { display: block !important; border: none; }
-        }
-    </style>
-</head>
-<body>
 
-<div class="container">
-    <h1 class="no-print">Calculadora de Custos Indiretos</h1>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-    <div id="etapa1" class="no-print">
-        <p class="question">Para o que você deseja calcular os custos indiretos hoje?</p>
+  <body>
+    <div class="container">
+      <h1 class="no-print">Calculadora de Custos Indiretos</h1>
+
+      <div id="etapa1" class="no-print">
+        <p class="question">
+          Para o que você deseja calcular os custos indiretos hoje?
+        </p>
         <div class="options">
-            <button class="btn-inicio" onclick="selecionarTipo('projetos')">Projetos</button>
-            <button class="btn-inicio" onclick="selecionarTipo('serviços')">Serviços</button>
+          <button class="btn-inicio" onclick="selecionarTipo('projetos')">
+            Projetos
+          </button>
+          <button class="btn-inicio" onclick="selecionarTipo('serviços')">
+            Serviços
+          </button>
         </div>
-    </div>
+      </div>
 
-    <div id="formulario-dados" class="hidden no-print">
-        <p style="text-align: center;">Calculando para: <strong id="tipo-escolhido"></strong></p>
+      <div id="formulario-dados" class="hidden no-print">
+        <p style="text-align: center">
+          Calculando para: <strong id="tipo-escolhido"></strong>
+        </p>
         <h3>Dados do Cálculo</h3>
-        
+
         <label>Nome do Servidor (Obrigatório):</label>
-        <input type="text" id="nomeServidor" placeholder="Digite seu nome completo">
+        <input
+          type="text"
+          id="nomeServidor"
+          placeholder="Digite seu nome completo"
+        />
 
         <div id="campo-projeto" class="hidden">
-            <label>Nome do Projeto (Obrigatório):</label>
-            <input type="text" id="nomeProjeto" placeholder="Digite o nome do projeto">
+          <label>Nome do Projeto (Obrigatório):</label>
+          <input
+            type="text"
+            id="nomeProjeto"
+            placeholder="Digite o nome do projeto"
+          />
         </div>
 
         <label>Nome da Divisão (Obrigatório):</label>
-        <input type="text" id="nomeDivisao" placeholder="Ex: DITPS">
-               <!-- <label>Laboratórios Utilizados:</label>
-<div style="display: flex; gap: 5px;">
-    <select id="selLaboratorio">
-        <option value="">-- Selecione o Laboratório --</option>
-        <option value="LAIMAGE" data-area="53.62">LAimage - Lab. de Imageamento p/ Micro e Nanoeletrônica</option>
-        <option value="LAPRINT" data-area="362.71">LAprint - Lab. Aberto de impressão 3D</option>
-        <option value="LAMINA" data-area="204.00">LAmina - Lab. de Micro e Nanofabricação</option>
-        <option value="LAFOTO" data-area="250.91">LAfoto - Lab. Aberto de Energia Fotovoltaica</option>
-        </select>
-    <button type="button" class="btn-add" onclick="adicionarLaboratorio()">Adicionar</button>
-</div> -->
-        <label>Laboratórios Utilizados:</label>
-        <div style="display: flex; gap: 5px;">
-            <select id="selLaboratorio">
-                <option value="">-- Selecione o Laboratório --</option>
-                <option value= "Lab. de Imageamento p/ Micro e Nanoeletrônica" data-area="53.62">LAimage - Lab. de Imageamento p/ Micro e Nanoeletrônica</option>
-                <option value="Lab. Aberto de Empacotamento e Integração de Sistemas" data-area="272.33">LApacs - Lab. Aberto de Empacotamento e Integração de Sistemas</option>
-                <option value="Lab. de Micro e Nanofabricação" data-area="204.00">LAmina - Lab. de Micro e Nanofabricação</option>
-                <option value="Lab. Aberto de impressão 3D" data-area="362.71">LAprint - Lab. Aberto de impressão 3D</option>
-                <option value="Lab. Aberto de Energia Fotovoltaica" data-area="250.91">LAfoto - Lab. Aberto de Energia Fotovoltaica</option>
-                <option value="Lab. de Processamento Fisico-Químico" data-area="117.45">LAsupport - Lab. de Processamento Fisico-Químico</option>
-                <option value="Lab. de Caracterização Espectroscópica" data-area="40.96">LAsupport - Lab. de Caracterização Espectroscópica</option>
-                <option value="Lab. de Fotônica" data-area="56.62">LAsupport - Lab. de Fotônica</option>
-                <option value="Lab. de Biotecnologia" data-area="30.88">LAsupport - Lab. de Biotecnologia</option>
-                <option value="Lab. DIPAQ" data-area="52.07">LAsupport - DIPAQ - Lab. de Análises de Falhas</option>
-                <option value="Lab. DIPAQ" data-area="104.11">LAsupport - DIPAQ - Lab. de Qualificação de Produtos Eletrônicos</option>
-                <option value="Lab. DIPAQ" data-area="171.16">LAsupport - DIPAQ - Lab. de Teste e Caracterização Elétrica</option>
-                <option value="Lab. de Síntese Orgânica e Nanomateriais" data-area="35.41">Lab. de Síntese Orgânica e Nanomateriais</option>
-                <option value="Lab. de Eletrônica Têxtil e Impressa" data-area="40.73">Lab. de Eletrônica Têxtil e Impressa</option>
-                <option value="Lab. de Materiais Funcionais" data-area="43.28">Lab. de Materiais Funcionais</option>
-                <option value="Lab. de Processos Físicos" data-area="41.92">Lab. de Processos Físicos</option>
-                <option value="Lab. de Sistemas Ciberfísicos" data-area="84.55">Lab. de Sistemas Ciberfísicos</option>
-                <option value="Lab. de Aprendizado de Máquina e Segurança da Informação" data-area="54.53">Lab. de Aprendizado de Máquina e Segurança da Informação</option>
-                <option value="Lab. de Metodologias para Governo Digital" data-area="72.71">Lab. de Metodologias para Governo Digital</option>
-                <option value="Lab. de Projetos e Circuitos Integrados" data-area="288.5">Lab. de Projetos e Circuitos Integrados</option>
-                <option value="Lab. de Recuperação de Materiais Eletrônicos" data-area="128.48">Lab. de Recuperação de Materiais Eletrônicos</option>
-                <option value="Lab. de Internet das Coisas" data-area="22.94">Lab. de Internet das Coisas</option>
-                <option value="Lab. de Biofabricação" data-area="64.76">Lab. de Biofabricação</option>
-                <option value="Lab. de Caracterização Óptica" data-area="21.71">Lab. de Caracterização Óptica</option>
-                <option value="Lab. de Tecnologias Virtuais" data-area="287.79">Lab. de Tecnologias Virtuais</option>
-                <option value="Lab. de Processamento Térmico - Sala de Fornos" data-area="21.09">Lab. de Processamento Térmico - Sala de Fornos</option>
-                <option value="Lab. de Processamento Orgânico" data-area="30.55">Lab. de Processamento Orgânico</option>
-                <option value="Lab. de Corte de Vidros" data-area="12.17">Lab. de Corte de Vidros</option>
-                <option value="Lab. de Instrumentação Científica" data-area="23.21">Lab. de Instrumentação Científica</option>
-                <option value="Lab. Linha Piloto de Displas" data-area="49.85">Lab. Linha Piloto de Displas</option>
-                <option value="Lab. LMECI" data-area="80.43">Lab. LMECI</option> 
-                <option value="Lab. LAEDAS" data-area="80.43">Lab. LAEDAS</option>
+        <input type="text" id="nomeDivisao" placeholder="Ex: DITPS" />
 
-                </select> <button type="button" class="btn-add" onclick="adicionarLaboratorio()">Adicionar</button>
-</div>
-<div id="area-labs-selecionados" class="lista-selecionados hidden">
-            <strong>Laboratórios Selecionados:</strong>
-            <div id="listaLabsWeb"></div>
+        <label>Laboratórios Utilizados:</label>
+        <div style="display: flex; gap: 5px">
+          <select id="selLaboratorio">
+            <option value="">-- Selecione o Laboratório --</option>
+            <option
+              value="Lab. de Imageamento p/ Micro e Nanoeletrônica"
+              data-area="53.62"
+            >
+              LAimage - Lab. de Imageamento p/ Micro e Nanoeletrônica
+            </option>
+            <option
+              value="Lab. Aberto de Empacotamento e Integração de Sistemas"
+              data-area="272.33"
+            >
+              LApacs - Lab. Aberto de Empacotamento e Integração de Sistemas
+            </option>
+            <option value="Lab. de Micro e Nanofabricação" data-area="204.00">
+              LAmina - Lab. de Micro e Nanofabricação
+            </option>
+            <option value="Lab. Aberto de impressão 3D" data-area="362.71">
+              LAprint - Lab. Aberto de impressão 3D
+            </option>
+            <option
+              value="Lab. Aberto de Energia Fotovoltaica"
+              data-area="250.91"
+            >
+              LAfoto - Lab. Aberto de Energia Fotovoltaica
+            </option>
+            <option
+              value="Lab. de Processamento Fisico-Químico"
+              data-area="117.45"
+            >
+              LAsupport - Lab. de Processamento Fisico-Químico
+            </option>
+            <option
+              value="Lab. de Caracterização Espectroscópica"
+              data-area="40.96"
+            >
+              LAsupport - Lab. de Caracterização Espectroscópica
+            </option>
+            <option value="Lab. de Fotônica" data-area="56.62">
+              LAsupport - Lab. de Fotônica
+            </option>
+            <option value="Lab. de Biotecnologia" data-area="30.88">
+              LAsupport - Lab. de Biotecnologia
+            </option>
+            <option value="Lab. DIPAQ" data-area="52.07">
+              LAsupport - DIPAQ - Lab. de Análises de Falhas
+            </option>
+            <option value="Lab. DIPAQ" data-area="104.11">
+              LAsupport - DIPAQ - Lab. de Qualificação de Produtos Eletrônicos
+            </option>
+            <option value="Lab. DIPAQ" data-area="171.16">
+              LAsupport - DIPAQ - Lab. de Teste e Caracterização Elétrica
+            </option>
+            <option
+              value="Lab. de Síntese Orgânica e Nanomateriais"
+              data-area="35.41"
+            >
+              Lab. de Síntese Orgânica e Nanomateriais
+            </option>
+            <option
+              value="Lab. de Eletrônica Têxtil e Impressa"
+              data-area="40.73"
+            >
+              Lab. de Eletrônica Têxtil e Impressa
+            </option>
+            <option value="Lab. de Materiais Funcionais" data-area="43.28">
+              Lab. de Materiais Funcionais
+            </option>
+            <option value="Lab. de Processos Físicos" data-area="41.92">
+              Lab. de Processos Físicos
+            </option>
+            <option value="Lab. de Sistemas Ciberfísicos" data-area="84.55">
+              Lab. de Sistemas Ciberfísicos
+            </option>
+            <option
+              value="Lab. de Aprendizado de Máquina e Segurança da Informação"
+              data-area="54.53"
+            >
+              Lab. de Aprendizado de Máquina e Segurança da Informação
+            </option>
+            <option
+              value="Lab. de Metodologias para Governo Digital"
+              data-area="72.71"
+            >
+              Lab. de Metodologias para Governo Digital
+            </option>
+            <option
+              value="Lab. de Projetos e Circuitos Integrados"
+              data-area="288.5"
+            >
+              Lab. de Projetos e Circuitos Integrados
+            </option>
+            <option
+              value="Lab. de Recuperação de Materiais Eletrônicos"
+              data-area="128.48"
+            >
+              Lab. de Recuperação de Materiais Eletrônicos
+            </option>
+            <option value="Lab. de Internet das Coisas" data-area="22.94">
+              Lab. de Internet das Coisas
+            </option>
+            <option value="Lab. de Biofabricação" data-area="64.76">
+              Lab. de Biofabricação
+            </option>
+            <option value="Lab. de Caracterização Óptica" data-area="21.71">
+              Lab. de Caracterização Óptica
+            </option>
+            <option value="Lab. de Tecnologias Virtuais" data-area="287.79">
+              Lab. de Tecnologias Virtuais
+            </option>
+            <option
+              value="Lab. de Processamento Térmico - Sala de Fornos"
+              data-area="21.09"
+            >
+              Lab. de Processamento Térmico - Sala de Fornos
+            </option>
+            <option value="Lab. de Processamento Orgânico" data-area="30.55">
+              Lab. de Processamento Orgânico
+            </option>
+            <option value="Lab. de Corte de Vidros" data-area="12.17">
+              Lab. de Corte de Vidros
+            </option>
+            <option value="Lab. de Instrumentação Científica" data-area="23.21">
+              Lab. de Instrumentação Científica
+            </option>
+            <option value="Lab. Linha Piloto de Displas" data-area="49.85">
+              Lab. Linha Piloto de Displas
+            </option>
+            <option value="Lab. LMECI" data-area="80.43">Lab. LMECI</option>
+            <option value="Lab. LAEDAS" data-area="80.43">Lab. LAEDAS</option>
+          </select>
+          <button
+            type="button"
+            class="btn-add"
+            onclick="adicionarLaboratorio()"
+          >
+            Adicionar
+          </button>
+        </div>
+        <div id="area-labs-selecionados" class="lista-selecionados hidden">
+          <strong>Laboratórios Selecionados:</strong>
+          <div id="listaLabsWeb"></div>
         </div>
 
         <label>Equipamento utilizado:</label>
-        <div style="display: flex; gap: 5px;">
-            <select id="selEquipamento">
-                <option value="">-- Adicione um laboratório primeiro --</option>
-            </select>
-            <button type="button" class="btn-add" onclick="adicionarEquipamento()">Adicionar</button>
+        <div style="display: flex; gap: 5px">
+          <select id="selEquipamento">
+            <option value="">-- Adicione um laboratório primeiro --</option>
+          </select>
+          <button
+            type="button"
+            class="btn-add"
+            onclick="adicionarEquipamento()"
+          >
+            Adicionar
+          </button>
         </div>
 
         <div id="area-selecionados" class="lista-selecionados hidden">
-            <strong>Equipamentos Selecionados:</strong>
-            <div id="listaEquipsWeb"></div>
+          <strong>Equipamentos Selecionados:</strong>
+          <div id="listaEquipsWeb"></div>
         </div>
 
         <div id="campo-duracao-servico" class="hidden">
-            <label>Tempo de Duração Total (Soma dos Equipamentos):</label>
-            <input type="number" id="horaServico" placeholder="0" readonly style="background-color: #f0f0f0;">
+          <label>Tempo de Duração Total (Soma dos Equipamentos):</label>
+          <input
+            type="number"
+            id="horaServico"
+            placeholder="0"
+            readonly
+            style="background-color: #f0f0f0"
+          />
         </div>
 
-        <!-- <div id="campo-duracao-projeto" class="hidden">
-            <label>Tempo de Duração (em MESES):</label>
-            <input type="number" id="mesesProjeto" placeholder="Ex: 12">
-            <input type="number" id="horasEquipamento" placeholder="0" readonly style="background-color: #f0f0f0;">
-        </div> -->
         <div id="campo-duracao-projeto" class="hidden">
-        <label>Tempo de Duração do Projeto (em MESES):</label>
-        <input type="number" id="mesesProjeto" placeholder="Ex: 12">
-        
-        <label style="margin-top: 10px; font-size: 0.85rem; color: #666;">Total de horas de equipamentos (Soma):</label>
-        <input type="number" id="horaEquipamento" placeholder="0" readonly style="background-color: #f0f0f0;">
-    </div>
+          <label>Tempo de Duração do Projeto (em MESES):</label>
+          <input type="number" id="mesesProjeto" placeholder="Ex: 12" />
 
-        <button class="btn-proximo" onclick="validarEGerar()">Gerar Relatório</button>
-    </div>
+          <label style="margin-top: 10px; font-size: 0.85rem; color: #666"
+            >Total de horas de equipamentos (Soma):</label
+          >
+          <input
+            type="number"
+            id="horaEquipamento"
+            placeholder="0"
+            readonly
+            style="background-color: #f0f0f0"
+          />
+        </div>
 
-    <div id="relatorio-final" class="hidden">
-        <h2 style="text-align: center; color: #004a80;">Relatório de Custos Indiretos</h2>
-        <hr>
-        <p><strong>Nome do Servidor:</strong> <span id="res-servidor"></span></p>
+        <button class="btn-proximo" onclick="validarEGerar()">
+          Gerar Relatório
+        </button>
+      </div>
+
+      <div id="relatorio-final" class="hidden">
+        <h2 style="text-align: center; color: #004a80">
+          Relatório de Custos Indiretos
+        </h2>
+        <hr />
+        <p>
+          <strong>Nome do Servidor:</strong> <span id="res-servidor"></span>
+        </p>
         <p><strong>Tipo:</strong> <span id="res-tipo"></span></p>
-        <p id="res-projeto-linha"><strong>Projeto:</strong> <span id="res-projeto"></span></p>
+        <p id="res-projeto-linha">
+          <strong>Projeto:</strong> <span id="res-projeto"></span>
+        </p>
         <p><strong>Divisão:</strong> <span id="res-divisao"></span></p>
-        
+
         <p><strong>Laboratórios Utilizados:</strong></p>
-        <ul id="res-lista-laboratorios" style="font-size: 0.9rem;"></ul>
+        <ul id="res-lista-laboratorios" style="font-size: 0.9rem"></ul>
 
         <p><strong>Equipamentos Utilizados:</strong></p>
-        <ul id="res-lista-equipamentos" style="font-size: 0.9rem;"></ul>
+        <ul id="res-lista-equipamentos" style="font-size: 0.9rem"></ul>
 
         <p><strong>Duração:</strong> <span id="res-duracao"></span></p>
-        
-        <div style="background: #eef6ff; padding: 10px; border-radius: 5px; margin-top: 15px;">
-            <p class="item-calculado"><strong>Área Alocada Total:</strong> <span id="res-area"></span> m²</p>
-            <p class="item-calculado"><strong>Total Depreciação Predial:</strong> R$ <span id="res-dep"></span></p>
-            <p class="item-calculado"><strong>Total Conservação Predial:</strong> R$ <span id="res-cons"></span></p>
-            <p class="item-calculado"><strong>Serviços e Suprimentos:</strong> R$ <span id="res-suprimentos"></span></p>
+
+        <div
+          style="
+            background: #eef6ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+          "
+        >
+          <p class="item-calculado">
+            <strong>Área Alocada Total:</strong> <span id="res-area"></span> m²
+          </p>
+          <p class="item-calculado">
+            <strong>Total Depreciação Predial:</strong> R$
+            <span id="res-dep"></span>
+          </p>
+          <p class="item-calculado">
+            <strong>Total Conservação Predial:</strong> R$
+            <span id="res-cons"></span>
+          </p>
+          <p class="item-calculado">
+            <strong>Serviços e Suprimentos:</strong> R$
+            <span id="res-suprimentos"></span>
+          </p>
+          <p class="item-calculado">
+            <strong>Depreciação de Equipamentos:</strong> R$
+            <span id="res-dep-equip"></span>
+          </p>
+          <p class="item-calculado">
+            <strong>Manutenção de Equipamentos:</strong> R$
+            <span id="res-man-equip"></span>
+          </p>
         </div>
-        
-        <br>
-        <p style="font-size: 0.8rem; color: #666;">Gerado em: <span id="data-geracao"></span></p>
-        <button class="btn-pdf no-print" onclick="window.print()">Salvar como PDF</button>
-        <button class="no-print" style="background: #666; margin-top: 10px;" onclick="location.reload()">Novo Cálculo</button>
+
+        <br />
+        <p style="font-size: 0.8rem; color: #666">
+          Gerado em: <span id="data-geracao"></span>
+        </p>
+        <button class="btn-pdf no-print" onclick="window.print()">
+          Salvar como PDF
+        </button>
+        <button
+          class="no-print"
+          style="background: #666; margin-top: 10px"
+          onclick="location.reload()"
+        >
+          Novo Cálculo
+        </button>
+      </div>
     </div>
-</div>
 
-<script>
-    let tipoGlobal = "";
-    let equipamentosSelecionados = [];
-    let laboratoriosSelecionados = [];
-    let somaTotalEquip = 0;
+    <script>
+      let tipoGlobal = "";
+      let equipamentosSelecionados = [];
+      let laboratoriosSelecionados = [];
+      let somaTotalEquip = 0;
 
-    const listaGeralEquipamentos = [ 
-        // Equipamentos do LAimage - Lab. de Imageamento p/ Micro e Nanoeletrônica 
-        { nome: "Microscópio eletrônico de varredura com litografia por feixe de elétrons - FEG-SEM Tescan modelo Mira 3 XMU equipado com EDS 60 mm Bruker", 
-        ano: 2018, 
-        valor: 1300000.00,
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica"},
+      const listaGeralEquipamentos = [
+        // Equipamentos do LAimage - Lab. de Imageamento p/ Micro e Nanoeletrônica
+        {
+          nome: "Microscópio eletrônico de varredura com litografia por feixe de elétrons - FEG-SEM Tescan modelo Mira 3 XMU equipado com EDS 60 mm Bruker",
+          ano: 2018,
+          valor: 1300000.0,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Sistema de nanomanipuladores para medidas elétricos in situ em microcópio eletrônico de varredura com resolução de 100 nm Imina Technologies modelo miBot BT-14", 
-        ano: 2018, 
-        valor: 350000.00, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica"},
+        {
+          nome: "Sistema de nanomanipuladores para medidas elétricos in situ em microcópio eletrônico de varredura com resolução de 100 nm Imina Technologies modelo miBot BT-14",
+          ano: 2018,
+          valor: 350000.0,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Microscópio de Força Atômica Nanosurf modelo EasyScan 2", 
-        ano: 2010, 
-        valor: 215000.00, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica" },
+        {
+          nome: "Microscópio de Força Atômica Nanosurf modelo EasyScan 2",
+          ano: 2010,
+          valor: 215000.0,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Microscópio óptico com fluorescência Olympus modelo MX61", 
-        ano: 2009, 
-        valor: 70000.00, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica"},
+        {
+          nome: "Microscópio óptico com fluorescência Olympus modelo MX61",
+          ano: 2009,
+          valor: 70000.0,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Sistemas de medidas elétricas por 4 pontas Jandell modelo 3000+ com RM3000 Test Unit", 
-        ano: 2018, 
-        valor: 40000.00, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica"},
+        {
+          nome: "Sistemas de medidas elétricas por 4 pontas Jandell modelo 3000+ com RM3000 Test Unit",
+          ano: 2018,
+          valor: 40000.0,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Espectrômetro de Fluorescência de Raios-X (XRF) Fischer modelo XDV-SD", 
-        ano: 2010, 
-        valor: 50000.00, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica"},
-        
-        { nome: "Microscópio óptico com fluorescência Thermofisher modelo EVOS M5000", 
-        ano: 2024, 
-        valor: 431962.99, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica" },
+        {
+          nome: "Espectrômetro de Fluorescência de Raios-X (XRF) Fischer modelo XDV-SD",
+          ano: 2010,
+          valor: 50000.0,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Difratômetro de Raios-X Panalytical Aeris", 
-        ano: 2025, 
-        valor: 1068059.87, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica" },
+        {
+          nome: "Microscópio óptico com fluorescência Thermofisher modelo EVOS M5000",
+          ano: 2024,
+          valor: 431962.99,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-         { nome: "Microtomógrafo Bruker SkyScan 1272 CMOS", 
-        ano: 2022, 
-        valor: 1519069.47, 
-        lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica" },
+        {
+          nome: "Difratômetro de Raios-X Panalytical Aeris",
+          ano: 2025,
+          valor: 1068059.87,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-// Equipamentos do LAsuport - Lab. de Processamento Fisico-Químico
+        {
+          nome: "Microtomógrafo Bruker SkyScan 1272 CMOS",
+          ano: 2022,
+          valor: 1519069.47,
+          lab: "Lab. de Imageamento p/ Micro e Nanoeletrônica",
+        },
 
-        { nome: "Sistema de glove-box com spinner e evaporadora térmica orgânica/ inorgânica integrados em atmosfera inerte Mbraun modelo LAB master sp", 
-        ano: 2011, 
-        valor: 1508000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        // Equipamentos do LAsuport - Lab. de Processamento Fisico-Químico
 
-        { nome: "Sistema de Deposição por Spray ultrassônico Sonotek modelo ExactaCoat", 
-        ano: 2009, 
-        valor: 160000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Sistema de glove-box com spinner e evaporadora térmica orgânica/ inorgânica integrados em atmosfera inerte Mbraun modelo LAB master sp",
+          ano: 2011,
+          valor: 1508000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-//dois equipamentos iguais, ano diferente, valor diferente, mesmo laboratório.
-        { nome: "Sistema de Deposição por Spray ultrassônico Sonotek modelo ExactaCoat", 
-        ano: 2011, 
-        valor: 170000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Sistema de Deposição por Spray ultrassônico Sonotek modelo ExactaCoat",
+          ano: 2009,
+          valor: 160000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Impressora jato de tinta para materiais metálicos - Dimatix modelo DMP-28", 
-        ano: 2009, 
-        valor: 70000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        //dois equipamentos iguais, ano diferente, valor diferente, mesmo laboratório.
+        {
+          nome: "Sistema de Deposição por Spray ultrassônico Sonotek modelo ExactaCoat",
+          ano: 2011,
+          valor: 170000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Impressoa jato de tinta para materiais orgânicos - Dimatix modelo DMP-28", 
-        ano: 2007, 
-        valor: 60000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Impressora jato de tinta para materiais metálicos - Dimatix modelo DMP-28",
+          ano: 2009,
+          valor: 70000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Perfilômetro NanoMap modelo 500LT", 
-        ano: 2013, 
-        valor: 150000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Impressoa jato de tinta para materiais orgânicos - Dimatix modelo DMP-28",
+          ano: 2007,
+          valor: 60000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Evaporadora térmica alto vácuo Edwards modelo EV400", 
-        ano: 2013, 
-        valor: 150000.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Perfilômetro NanoMap modelo 500LT",
+          ano: 2013,
+          valor: 150000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Sputtering de filmes ulta-finos de ouro -E5200 Auto Sputter Coater", 
-        ano: 1990, 
-        valor: 1, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Evaporadora térmica alto vácuo Edwards modelo EV400",
+          ano: 2013,
+          valor: 150000.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Forno Tubular EDG modelo FTH1-60", 
-        ano: 2007, 
-        valor: 15420.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Sputtering de filmes ulta-finos de ouro -E5200 Auto Sputter Coater",
+          ano: 1990,
+          valor: 1,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Evaporadora por feixe de elétrons Edwards FL400 Auto306 cryo", 
-        ano: 2015, 
-        valor: 9150.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Forno Tubular EDG modelo FTH1-60",
+          ano: 2007,
+          valor: 15420.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Câmara para caracterização de materiais por Field Emission", 
-        ano: 2000, 
-        valor: 1.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Evaporadora por feixe de elétrons Edwards FL400 Auto306 cryo",
+          ano: 2015,
+          valor: 9150.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Infraestrutura complementar para preparação de amostras", 
-        ano: 2020, 
-        valor: 1.00, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Câmara para caracterização de materiais por Field Emission",
+          ano: 2000,
+          valor: 1.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Sistema de Análise Óptica para Dispositivos de Iliminação - EVERFINE YF1000", 
-        ano: 2022, 
-        valor: 365176.26, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Infraestrutura complementar para preparação de amostras",
+          ano: 2020,
+          valor: 1.0,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Gerador de eletróstatica EVERFINE modelo EMS61000-2A", 
-        ano: 2022, 
-        valor: 26144.97, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Sistema de Análise Óptica para Dispositivos de Iliminação - EVERFINE YF1000",
+          ano: 2022,
+          valor: 365176.26,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Gerador de surtos EVERFINE modelo EMS61000-5A", 
-        ano: 2022, 
-        valor: 33735.79, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Gerador de eletróstatica EVERFINE modelo EMS61000-2A",
+          ano: 2022,
+          valor: 26144.97,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Gerador de interrupção e quedas de tensão EVERFINE modelo EMS61000-11K", 
-        ano: 2022, 
-        valor: 18554.14, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Gerador de surtos EVERFINE modelo EMS61000-5A",
+          ano: 2022,
+          valor: 33735.79,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Gerador de transientes EVERFINE modelo EMS61000-4B", 
-        ano: 2022, 
-        valor: 32049.55, 
-        lab: "Lab. de Processamento Fisico-Químico"},
+        {
+          nome: "Gerador de interrupção e quedas de tensão EVERFINE modelo EMS61000-11K",
+          ano: 2022,
+          valor: 18554.14,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-// Equipamentos do LAsupport - Lab. de Caracterização Espectroscópica
-        { nome: "Microscópio de infravermelho Thermo Electron modelo iN10", 
-        ano: 2011, 
-        valor: 165000.00, 
-        lab: "Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Gerador de transientes EVERFINE modelo EMS61000-4B",
+          ano: 2022,
+          valor: 32049.55,
+          lab: "Lab. de Processamento Fisico-Químico",
+        },
 
-        { nome: "Espectrômetro de absorção e fluorescência UV-Vis-NIR Horiba modelo Duetta", 
-        ano: 2019, 
-        valor: 315000.00, 
-        lab: "Lab. de Caracterização Espectroscópica"},
+        // Equipamentos do LAsupport - Lab. de Caracterização Espectroscópica
+        {
+          nome: "Microscópio de infravermelho Thermo Electron modelo iN10",
+          ano: 2011,
+          valor: 165000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Espectrômetro UV/VIS/NIR Perkin Elmer modelo Lambda 900", 
-        ano: 2001,
-        valor: 180000.00, 
-        lab: "Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Espectrômetro de absorção e fluorescência UV-Vis-NIR Horiba modelo Duetta",
+          ano: 2019,
+          valor: 315000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Simulador Solar ScienceTech modelo SS 1kW", 
-        ano: 2010, 
-        valor: 120000.00, 
-        lab: "Lab. de Caracterização Espectroscópica"},
-//EQUIPAMENTO REPETIDO, MESMO NOME, MESMO LABORATÓRIO, ANO DIFERENTE.
-        { nome: "Simulador Solar ScienceTech modelo SS 1kW", 
-        ano: 2008, 
-        valor: 120000.00, 
-        lab: "Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Espectrômetro UV/VIS/NIR Perkin Elmer modelo Lambda 900",
+          ano: 2001,
+          valor: 180000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Espectrômetro de Infravermelho - Spectrum 100 - Perkin Elmer", 
-        ano: 2009, 
-        valor: 55000.00, 
-        lab: "Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Simulador Solar ScienceTech modelo SS 1kW",
+          ano: 2010,
+          valor: 120000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
+        //EQUIPAMENTO REPETIDO, MESMO NOME, MESMO LABORATÓRIO, ANO DIFERENTE.
+        {
+          nome: "Simulador Solar ScienceTech modelo SS 1kW",
+          ano: 2008,
+          valor: 120000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Medidor de Ângulo de Contato DataPhysics Instruments modelo OCA 15", 
-        ano: 2008, 
-        valor: 60000.00, 
-        lab:"Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Espectrômetro de Infravermelho - Spectrum 100 - Perkin Elmer",
+          ano: 2009,
+          valor: 55000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Microscópio de luz polarizada Olympus modelo BX51 com estágio de aquecimento/resfriamento Instec", 
-        ano: 2008, 
-        valor: 45000.00, 
-        lab:"Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Medidor de Ângulo de Contato DataPhysics Instruments modelo OCA 15",
+          ano: 2008,
+          valor: 60000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Simulador Solar Ossila G2009A1", 
-        ano: 2022, 
-        valor: 14968.20, 
-        lab:"Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Microscópio de luz polarizada Olympus modelo BX51 com estágio de aquecimento/resfriamento Instec",
+          ano: 2008,
+          valor: 45000.0,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
-        { nome: "Simulador Solar LumiSun-50", 
-        ano: 2024, 
-        valor: 79310.23, 
-        lab:"Lab. de Caracterização Espectroscópica"},
-        
-        { nome: "Estação de Trabalho",
-         ano: null, 
-         valor: 4391.76, 
-         lab:"Lab. de Caracterização Espectroscópica"},
+        {
+          nome: "Simulador Solar Ossila G2009A1",
+          ano: 2022,
+          valor: 14968.2,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
+        {
+          nome: "Simulador Solar LumiSun-50",
+          ano: 2024,
+          valor: 79310.23,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
+
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. de Caracterização Espectroscópica",
+        },
 
         // equipamentos do LAsupport - Lab. de Fotônica
-        { nome: "Caracterização de circuitos integrados fotônicos com montagem micro/nano posicionadores automáticos", 
-        ano: 2012, 
-        valor: 145000.00, 
-        lab: "Lab. de Fotônica"},
+        {
+          nome: "Caracterização de circuitos integrados fotônicos com montagem micro/nano posicionadores automáticos",
+          ano: 2012,
+          valor: 145000.0,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Laser sintonizável banda C infravermelho com saída em fibra optica", 
-        ano: 2012, 
-        valor: 85000.00, 
-        lab: "Lab. de Fotônica"},
+        {
+          nome: "Laser sintonizável banda C infravermelho com saída em fibra optica",
+          ano: 2012,
+          valor: 85000.0,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Mesa 3D",  
-        ano: 2020, 
-        valor: 235421.31, 
-        lab: "Lab. de Fotônica"},
+        {
+          nome: "Mesa 3D",
+          ano: 2020,
+          valor: 235421.31,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Analisador de parâmetros opticos", 
-        ano: 2017, 
-        valor: 103000.00, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Analisador de parâmetros opticos",
+          ano: 2017,
+          valor: 103000.0,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Simulador Solar ScienceTech modelo SS 1kW", 
-        ano: 2010, 
-        valor: 120000.00, 
-        lab: "Lab. de Fotônica"},
+        {
+          nome: "Simulador Solar ScienceTech modelo SS 1kW",
+          ano: 2010,
+          valor: 120000.0,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Espectrômetro de absorção e fluorescência UV-Vis-NIR Horiba modelo Duetta", 
-        ano: 2019, 
-        valor: 315000.00, 
-        lab: "Lab. de Fotônica"},
+        {
+          nome: "Espectrômetro de absorção e fluorescência UV-Vis-NIR Horiba modelo Duetta",
+          ano: 2019,
+          valor: 315000.0,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Fonte laser sintonizável - Agilent 81980A Tunable Laser Source", 
-        ano: 2012, 
-        valor: 81412.94, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Fonte laser sintonizável - Agilent 81980A Tunable Laser Source",
+          ano: 2012,
+          valor: 81412.94,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Fonte laser sintonizável - CoBriteDX4-2-C-H01-FA", 
-        ano: 2014, 
-        valor: 23666.74, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Fonte laser sintonizável - CoBriteDX4-2-C-H01-FA",
+          ano: 2014,
+          valor: 23666.74,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Fonte de Luz de Banda Larga -Amonics ASLD-CWDM-5-B-FA Super- Wideband Light Source", 
-        ano: 2012, 
-        valor: 33717.75, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Fonte de Luz de Banda Larga -Amonics ASLD-CWDM-5-B-FA Super- Wideband Light Source",
+          ano: 2012,
+          valor: 33717.75,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Medidor de Potência ótica de 4 canais - Keysight N7744A Optical Multiport Power Meter", 
-        ano: 2012, 
-        valor: 10903.36, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Medidor de Potência ótica de 4 canais - Keysight N7744A Optical Multiport Power Meter",
+          ano: 2012,
+          valor: 10903.36,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Estabilizador ativo de polarização - General Photonics  Polastay PDS 103-A", 
-        ano: 2012, 
-        valor: 15038.12, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Estabilizador ativo de polarização - General Photonics  Polastay PDS 103-A",
+          ano: 2012,
+          valor: 15038.12,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Analisador de Espectro Óptico - Yokogawa AQ6370c", 
-         ano: 2012, 
-         valor: 63593.72, 
-         lab:"Lab. de Fotônica"},
+        {
+          nome: "Analisador de Espectro Óptico - Yokogawa AQ6370c",
+          ano: 2012,
+          valor: 63593.72,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Fonte e medidor de tensão/corrente integrado - Keithley 2401 Sourcemeter", 
-        ano: 2012, 
-        valor: 5419.36, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Fonte e medidor de tensão/corrente integrado - Keithley 2401 Sourcemeter",
+          ano: 2012,
+          valor: 5419.36,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Setups para aclopamento vertical e lateral", 
-        ano: 2017, 
-        valor: 26578.79, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Setups para aclopamento vertical e lateral",
+          ano: 2017,
+          valor: 26578.79,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Máquina de fusão (emenda) de fibra ótica- FITEL S179 Fusion Slicer", 
-        ano: 2023, 
-        valor: 19900.00, 
-        lab:"Lab. de Fotônica"},
+        {
+          nome: "Máquina de fusão (emenda) de fibra ótica- FITEL S179 Fusion Slicer",
+          ano: 2023,
+          valor: 19900.0,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Impressora 3D de resina - Creality Halot Mage 8k", 
-        ano: 2024, 
-        valor: 3927.70, 
-        lab:"Lab. de Fotônica"},
-        
-        { nome: "Estação de Trabalho",
-         ano: null, 
-         valor: 4391.76, 
-         lab:"Lab. de Fotônica"},
+        {
+          nome: "Impressora 3D de resina - Creality Halot Mage 8k",
+          ano: 2024,
+          valor: 3927.7,
+          lab: "Lab. de Fotônica",
+        },
 
-    //equipamentos do Lab. biotecnologia
-        { nome: "Impressora 3D Modelo 593", 
-        ano: 2024, 
-        valor: 850000.00, 
-        lab: "Lab. de Biotecnologia"},
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. de Fotônica",
+        },
 
-        { nome: "Misturador Hauschild Speed Mixer 250 DAC", 
-        ano: 2024, 
-        valor: 30000.00, 
-        lab: "Lab. Biotecnologia"},
+        //equipamentos do Lab. de Biotecnologia
+        {
+          nome: "Impressora 3D Modelo 593",
+          ano: 2024,
+          valor: 850000.0,
+          lab: "Lab. de Biotecnologia",
+        },
 
-        { nome: "Liofilizador Labconco modelo FreeZone 2.5 Lister Benchtop Freeze Dry", 
-        ano: 2022, 
-        valor: 73360.00, 
-        lab: "Lab. de Biotecnologia"},
+        {
+          nome: "Misturador Hauschild Speed Mixer 250 DAC",
+          ano: 2024,
+          valor: 30000.0,
+          lab: "Lab. de Biotecnologia",
+        },
 
-        { nome: "Leitor de Multiplacas Loccus modelo LMR 96-i", 
-        ano: 2022, 
-        valor: 22000.00, 
-        lab: "Lab. de Biotecnologia"},
+        {
+          nome: "Liofilizador Labconco modelo FreeZone 2.5 Lister Benchtop Freeze Dry",
+          ano: 2022,
+          valor: 73360.0,
+          lab: "Lab. de Biotecnologia",
+        },
 
-        { nome: "Forno de sinterização com controlador Incon modelo CNT 400", 
-        ano: 2024, 
-        valor: 135260.00, 
-        lab: "Lab. de Biotecnologia"},
+        {
+          nome: "Leitor de Multiplacas Loccus modelo LMR 96-i",
+          ano: 2022,
+          valor: 22000.0,
+          lab: "Lab. de Biotecnologia",
+        },
 
-        { nome: "Shaker", 
-        ano: 2020, 
-        valor: 300000.00, 
-        lab: "Lab. de Biotecnologia"},
+        {
+          nome: "Forno de sinterização com controlador Incon modelo CNT 400",
+          ano: 2024,
+          valor: 135260.0,
+          lab: "Lab. de Biotecnologia",
+        },
 
-        { nome: "Estação de Trabalho", 
-        ano: null, 
-        valor: 4391.76, 
-        lab:"Lab. de Biotecnologia"},
+        {
+          nome: "Shaker",
+          ano: 2020,
+          valor: 300000.0,
+          lab: "Lab. de Biotecnologia",
+        },
 
-//Equipamentos Dipaq - Lab. de Análises de Falhas, Lab. de Qualificação de Produtos Eletrônicos, Lab. de Teste e Caracterização Elétrica, ficou todos juntos no filtro
-        { nome: "MicroFlex", 
-        ano: 2020, 
-        valor: 1000000.00, 
-        lab: "Lab. DIPAQ"},
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. de Biotecnologia",
+        },
 
-        { nome: "Probe Station", 
-        ano: 2020, 
-        valor: 700000.00, 
-        lab: "Lab. DIPAQ"},
+        //Equipamentos Dipaq - Lab. de Análises de Falhas, Lab. de Qualificação de Produtos Eletrônicos, Lab. de Teste e Caracterização Elétrica, ficou todos juntos no filtro
+        { nome: "MicroFlex", ano: 2020, valor: 1000000.0, lab: "Lab. DIPAQ" },
 
-        { nome: "RF", 
-        ano: 2020, 
-        valor: 645022.43, 
-        lab: "Lab. DIPAQ"},
+        {
+          nome: "Probe Station",
+          ano: 2020,
+          valor: 700000.0,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Câmara Climática", 
-        ano: 2020, 
-        valor: 200000.00, 
-        lab:"Lab. DIPAQ"},
+        { nome: "RF", ano: 2020, valor: 645022.43, lab: "Lab. DIPAQ" },
 
-        { nome: "Câmara Térmica", 
-        ano: 2020, 
-        valor : 200000.00 , 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Câmara Climática",
+          ano: 2020,
+          valor: 200000.0,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Analisador de parâmetros semicondutores - B1500A", 
-        ano: 2020, 
-        valor: 179562.50, 
-        lab: "Lab. DIPAQ"},
+        {
+          nome: "Câmara Térmica",
+          ano: 2020,
+          valor: 200000.0,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Must 3+", 
-        ano: 2020, 
-        valor: 85351.95, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Analisador de parâmetros semicondutores - B1500A",
+          ano: 2020,
+          valor: 179562.5,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Equip. Elétricos", 
-        ano: 2020, 
-        valor: 78148.65, 
-        lab:"Lab. DIPAQ"},
+        { nome: "Must 3+", ano: 2020, valor: 85351.95, lab: "Lab. DIPAQ" },
 
-        { nome: "CM-60", 
-        ano: 2020, 
-        valor: 70000.00, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Equip. Elétricos",
+          ano: 2020,
+          valor: 78148.65,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Plasma Etching", 
-        ano: 2020, 
-        valor: 58000.00, 
-        lab:"Lab. DIPAQ"},
+        { nome: "CM-60", ano: 2020, valor: 70000.0, lab: "Lab. DIPAQ" },
 
-        { nome: "Raio-X", 
-        ano: 2020, 
-        valor: 56153.70, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Plasma Etching",
+          ano: 2020,
+          valor: 58000.0,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Microscópico Metalográfico", 
-        ano: 2020, 
-        valor: 52434.60, 
-        lab:"Lab. DIPAQ"},
+        { nome: "Raio-X", ano: 2020, valor: 56153.7, lab: "Lab. DIPAQ" },
 
-        { nome: "Estufa", 
-        ano: 2020, 
-        valor: 50000.00, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Microscópico Metalográfico",
+          ano: 2020,
+          valor: 52434.6,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Microscópio Estereo", 
-        ano: 2020, 
-        valor: 43094.12, 
-        lab:"Lab. DIPAQ"},
+        { nome: "Estufa", ano: 2020, valor: 50000.0, lab: "Lab. DIPAQ" },
 
-        { nome: "EMIC", 
-        ano: 2020, 
-        valor: 38000.00, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Microscópio Estereo",
+          ano: 2020,
+          valor: 43094.12,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Instrumentação", 
-        ano: 2020, 
-        valor: 30881.23, 
-        lab:"Lab. DIPAQ"},
+        { nome: "EMIC", ano: 2020, valor: 38000.0, lab: "Lab. DIPAQ" },
 
-        { nome: "Autoclave", 
-        ano: 2020, 
-        valor: 30000.00, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Instrumentação",
+          ano: 2020,
+          valor: 30881.23,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Névoa salina", 
-        ano: 2020, 
-        valor: 30000.00, 
-        lab:"Lab. DIPAQ"},
+        { nome: "Autoclave", ano: 2020, valor: 30000.0, lab: "Lab. DIPAQ" },
 
-        { nome: "Ciclagem Líq. Líq.", 
-        ano: 2020, 
-        valor: 30000.00, 
-        lab:"Lab. DIPAQ"},
+        { nome: "Névoa salina", ano: 2020, valor: 30000.0, lab: "Lab. DIPAQ" },
 
-        { nome: "Politrizes", 
-        ano: 2020, 
-        valor: 9800.00, 
-        lab:"Lab. DIPAQ"},
+        {
+          nome: "Ciclagem Líq. Líq.",
+          ano: 2020,
+          valor: 30000.0,
+          lab: "Lab. DIPAQ",
+        },
 
-        { nome: "Cadinho",
-         ano: 2020, 
-         valor: 2225.69, 
-         lab:"Lab. DIPAQ"},
+        { nome: "Politrizes", ano: 2020, valor: 9800.0, lab: "Lab. DIPAQ" },
 
-         { nome: "Estação de Trabalho", 
-         ano: null, 
-         valor: 4391.76, 
-         lab:"Lab. DIPAQ"},
+        { nome: "Cadinho", ano: 2020, valor: 2225.69, lab: "Lab. DIPAQ" },
+
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. DIPAQ",
+        },
 
         // Equipamentos do Lab. de Micro e Nanofabricação
 
-        { nome: "Alinhadora de máscara por contato UV400 Karl Suss Modelo MJB3", 
-        ano: 2001, 
-        valor: 150000.00, 
-        lab: "Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Alinhadora de máscara por contato UV400 Karl Suss Modelo MJB3",
+          ano: 2001,
+          valor: 150000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Sistema de corrosão seca por íons reativos Oxford Tech. modelo RIE-80", 
-        ano: 1994, 
-        valor: 40000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Sistema de corrosão seca por íons reativos Oxford Tech. modelo RIE-80",
+          ano: 1994,
+          valor: 40000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Spin Coating Brewer Science modelo Cee 200CBX 8\" com placa quente", 
-        ano: 2013, 
-        valor: 80000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: 'Spin Coating Brewer Science modelo Cee 200CBX 8" com placa quente',
+          ano: 2013,
+          valor: 80000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Sistema de deposição e recozimento – Brewer Science modelo Cee 200CBX 8\"", 
-        ano: 2013, 
-        valor: 200000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: 'Sistema de deposição e recozimento – Brewer Science modelo Cee 200CBX 8"',
+          ano: 2013,
+          valor: 200000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Spin Coating para fotoresiste Headway 6''", 
-        ano: 2020, 
-        valor: 50000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Spin Coating para fotoresiste Headway 6''",
+          ano: 2020,
+          valor: 50000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Microscópio óptico de inspeção com capacidade de até 8\" Nikon modelo Eclipse L2O", 
-        ano: 2020, 
-        valor : 50000.00 , 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: 'Microscópio óptico de inspeção com capacidade de até 8" Nikon modelo Eclipse L2O',
+          ano: 2020,
+          valor: 50000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Sistema de Litografia direta a Laser UV Heidelberg Instruments modelo DWL-66FS (DWL)", 
-        ano: 2011, 
-        valor: 1100000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Sistema de Litografia direta a Laser UV Heidelberg Instruments modelo DWL-66FS (DWL)",
+          ano: 2011,
+          valor: 1100000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Sistema de deposição de filmes finos Langmuir-Blodgett com cuba - Biolin Scientific", 
-        ano: 2015, 
-        valor: 25000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Sistema de deposição de filmes finos Langmuir-Blodgett com cuba - Biolin Scientific",
+          ano: 2015,
+          valor: 25000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Sistema de limpeza de máscaras e substrato Balzers modelo BMC701", 
-        ano: 1995, 
-        valor: 250000.00, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Sistema de limpeza de máscaras e substrato Balzers modelo BMC701",
+          ano: 1995,
+          valor: 250000.0,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Copiadora de máscaras por UV Tamarack Série 155", 
-        ano: 1994, 
-        valor: 1644.40, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Copiadora de máscaras por UV Tamarack Série 155",
+          ano: 1994,
+          valor: 1644.4,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
-        { nome: "Estação de Trabalho", 
-        ano: null, 
-        valor: 4391.76, 
-        lab:"Lab. de Micro e Nanofabricação"},
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. de Micro e Nanofabricação",
+        },
 
         //Equipamentos do Lab. Aberto de Empacotamento e Integração de Sistemas
 
-        { nome: "Máquina de selagem hermética Solid State Equip. Co. modelo Parallel Seam 1000", 
-        ano: 2006, 
-        valor: 250000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
-        
-        { nome: "Cortadora de lâminas Disco Corp modelo DAD 321", 
-        ano: 2011, 
-        valor: 210000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
-        
-        { nome: "Pick and Place para SMD Essemtech Paraquda", 
-        ano: 1998, 
-        valor: 70000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Máquina de selagem hermética Solid State Equip. Co. modelo Parallel Seam 1000",
+          ano: 2006,
+          valor: 250000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Forno de Refusão SMD Heller 1088", 
-         ano: 2009, 
-        valor: 150000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Cortadora de lâminas Disco Corp modelo DAD 321",
+          ano: 2011,
+          valor: 210000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Soldadora de Fios manual TPT HB 160", 
-        ano: 1990, 
-        valor: 80000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Pick and Place para SMD Essemtech Paraquda",
+          ano: 1998,
+          valor: 70000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Soldadora de Fios automática ITM Bonda 101", 
-        ano: 2009, 
-        valor: 65000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Forno de Refusão SMD Heller 1088",
+          ano: 2009,
+          valor: 150000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Dispensador resina / pasta de solda CAM/ALOT 1414",
-         ano: 2012, 
-         valor: 225000.00, 
-         lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Soldadora de Fios manual TPT HB 160",
+          ano: 1990,
+          valor: 80000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-         { nome: "Sist. de montagem Flip-Chip Semi Corp Eagle 860", 
-         ano: 2001, 
-         valor: 60000.00, 
-         lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Soldadora de Fios automática ITM Bonda 101",
+          ano: 2009,
+          valor: 65000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-         { nome: "Estação de retrabalho de BGA PACE ThermoFloTF200", 
-         ano: 2001, 
-         valor: 86.00, 
-         lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Dispensador resina / pasta de solda CAM/ALOT 1414",
+          ano: 2012,
+          valor: 225000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-         { nome: "Equip. inspeção de Raios-X PACE XR 2000", 
-         ano: 2008, 
-         valor: 123000.00, 
-         lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
-         
-         { nome: "Impressora de solda por estêncil DIMA SMT HS 100", 
-         ano: 2006, 
-         valor: 65000.00, 
-         lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Sist. de montagem Flip-Chip Semi Corp Eagle 860",
+          ano: 2001,
+          valor: 60000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Microscópio para inspeção de BGA Ersascope", 
-        ano: 2012, 
-        valor: 220000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Estação de retrabalho de BGA PACE ThermoFloTF200",
+          ano: 2001,
+          valor: 86.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Perfilômetro Mecânico Dektak XT", 
-        ano: 2010, 
-        valor: 600000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Equip. inspeção de Raios-X PACE XR 2000",
+          ano: 2008,
+          valor: 123000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Sistema de deposição Sputtering RF Kurt Lesker 3 Guns", 
-        ano: 2012, 
-        valor: 400000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Impressora de solda por estêncil DIMA SMT HS 100",
+          ano: 2006,
+          valor: 65000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Sistema de Processamento Laser UV Newport modelo Pulseo", 
-        ano: 2015, 
-        valor: 106642.26, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Microscópio para inspeção de BGA Ersascope",
+          ano: 2012,
+          valor: 220000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
-        { nome: "Agitador magnético digital com aquecimento e sonda com base quadrada em cerâmica", 
-        ano: 2022, 
-        valor: 10000.00, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
-        
-        { nome: "Estação de Trabalho", 
-        ano: null, 
-        valor: 4391.76, 
-        lab:"Lab. Aberto de Empacotamento e Integração de Sistemas"},
+        {
+          nome: "Perfilômetro Mecânico Dektak XT",
+          ano: 2010,
+          valor: 600000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
+
+        {
+          nome: "Sistema de deposição Sputtering RF Kurt Lesker 3 Guns",
+          ano: 2012,
+          valor: 400000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
+
+        {
+          nome: "Sistema de Processamento Laser UV Newport modelo Pulseo",
+          ano: 2015,
+          valor: 106642.26,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
+
+        {
+          nome: "Agitador magnético digital com aquecimento e sonda com base quadrada em cerâmica",
+          ano: 2022,
+          valor: 10000.0,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
+
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
+        },
 
         // Equipamentos Lab. Aberto de impressão 3D
 
-        { nome: "Tecnologia de impressão 3D por multijatos (PolyJet) Objet - Stratasys modelo Connex 350", 
-        ano: 2010, 
-        valor: 516734.43, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Tecnologia de impressão 3D por multijatos (PolyJet) Objet - Stratasys modelo Connex 350",
+          ano: 2010,
+          valor: 516734.43,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Equipamento de Manufatura aditiva por processo de impressão 3D em gesso e outros materiais - marca Zcorp", 
-        ano: 2003, 
-        valor: 146510.00, 
-        lab:"Lab. Aberto de impressão 3D"},
-        
-        { nome: "Plataforma experimental de Impressão 3D para ensaios e estruturação de materiais em camadas Projeto open source CTI modelo Fab@CTI", 
-        ano: 2006, 
-        valor: 5000.00, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Equipamento de Manufatura aditiva por processo de impressão 3D em gesso e outros materiais - marca Zcorp",
+          ano: 2003,
+          valor: 146510.0,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Tecnologia de impressão 3D por extrusão de filamento (FDM) Stratasys modelo Fortus 400mc", 
-        ano: 2012, //ano estava diferente da planilha(2007), deixei igual.
-        valor: 221915.12, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Plataforma experimental de Impressão 3D para ensaios e estruturação de materiais em camadas Projeto open source CTI modelo Fab@CTI",
+          ano: 2006,
+          valor: 5000.0,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Tecnologia de impressão 3D por extrusão de filamento (FDM) Stratasys modelo Vantage i", 
-        ano: 2007, 
-        valor: 221915.12, 
-        lab:"Lab. Aberto de impressão 3D"}, 
+        {
+          nome: "Tecnologia de impressão 3D por extrusão de filamento (FDM) Stratasys modelo Fortus 400mc",
+          ano: 2012, //ano estava diferente da planilha(2007), deixei igual.
+          valor: 221915.12,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Tecnologia de impressão 3D por Sinterização Seletiva à Laser (SLS) DTM Corporation - 3D Systems modelo Sinterstation 2000", 
-        ano: 1998, 
-        valor: 340236.00, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Tecnologia de impressão 3D por extrusão de filamento (FDM) Stratasys modelo Vantage i",
+          ano: 2007,
+          valor: 221915.12,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Tecnologia de impressão 3D por Sinterização Seletiva à Laser (SLS) 3D Systems modelo Sinterstation HiQ", 
-        ano: 2007, 
-        valor: 494506.38, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Tecnologia de impressão 3D por Sinterização Seletiva à Laser (SLS) DTM Corporation - 3D Systems modelo Sinterstation 2000",
+          ano: 1998,
+          valor: 340236.0,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Tecnologia de impressão 3D por jateamento de cera (WaxJet) Solidscape - Stratasys modelo R66+", 
-        ano: 2010, 
-        valor: 60849.90, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Tecnologia de impressão 3D por Sinterização Seletiva à Laser (SLS) 3D Systems modelo Sinterstation HiQ",
+          ano: 2007,
+          valor: 494506.38,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Tecnologia de impressão 3D por jateamento de líquido aglutinante (Binder Jetting) Z Corporation - 3D Systems modelo 3DP Spectrum Z510", 
-        ano: 2008, 
-        valor: 122768.76, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Tecnologia de impressão 3D por jateamento de cera (WaxJet) Solidscape - Stratasys modelo R66+",
+          ano: 2010,
+          valor: 60849.9,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Digitalizador tridimensional com capacidade de geração de nuvens de pontos, exportados na forma de arquivos digitais - Scanner 3D-EXAscan", 
-        ano: 2009, 
-        valor: 79062.61, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Tecnologia de impressão 3D por jateamento de líquido aglutinante (Binder Jetting) Z Corporation - 3D Systems modelo 3DP Spectrum Z510",
+          ano: 2008,
+          valor: 122768.76,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Equipamento de manufatura aditiva por feixe de elétrons - ARCAM Q10 Plus", 
-        ano: 2015, 
-        valor: 2530293.07, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Digitalizador tridimensional com capacidade de geração de nuvens de pontos, exportados na forma de arquivos digitais - Scanner 3D-EXAscan",
+          ano: 2009,
+          valor: 79062.61,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Equipamento para usinagem três eixos de blocos de resina e scanner 3D para cópia de objetos tridimensionais - Roland - MDX-20", 
-        ano: 2004, 
-        valor: 15000.00, 
-        lab:"Lab. Aberto de impressão 3D"},
+        {
+          nome: "Equipamento de manufatura aditiva por feixe de elétrons - ARCAM Q10 Plus",
+          ano: 2015,
+          valor: 2530293.07,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Leitora de microplacas (Elisa)", 
-        ano: 2022, 
-        valor: 22000.00, 
-        lab:"Lab. Aberto de Impressão 3D"},
-        
-        { nome: "Estação de Trabalho para Processamento de Dados em Unidades de Processamento Gráfico (GPU)", 
-        ano: 2019, 
-        valor: 164285.00, 
-        lab:"Lab. Aberto de Impressão 3D"},
+        {
+          nome: "Equipamento para usinagem três eixos de blocos de resina e scanner 3D para cópia de objetos tridimensionais - Roland - MDX-20",
+          ano: 2004,
+          valor: 15000.0,
+          lab: "Lab. Aberto de impressão 3D",
+        },
 
-        { nome: "Estação de Trabalho", 
-        ano: null, 
-        valor: 4391.76, 
-        lab:"Lab. Aberto de Impressão 3D"},
+        {
+          nome: "Leitora de microplacas (Elisa)",
+          ano: 2022,
+          valor: 22000.0,
+          lab: "Lab. Aberto de Impressão 3D",
+        },
+
+        {
+          nome: "Estação de Trabalho para Processamento de Dados em Unidades de Processamento Gráfico (GPU)",
+          ano: 2019,
+          valor: 164285.0,
+          lab: "Lab. Aberto de Impressão 3D",
+        },
+
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. Aberto de Impressão 3D",
+        },
 
         //EQUIPAMENTOS Lab. Aberto de Energia Fotovoltaica
-        { nome: "Soldadora semi automática de células por aquecimento LightBeam", 
-        ano: 2010, 
-        valor: 137887.25, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
-        
-        { nome: "Mesa de corte e processamento de barramentos para células", 
-        ano: 2013, 
-        valor: 9400.00, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
-        
-        { nome: "Mesas para posicionamento e movimentação de módulos fotovoltaicos", 
-        ano: 2013, 
-        valor: 20863.00, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
+        {
+          nome: "Soldadora semi automática de células por aquecimento LightBeam",
+          ano: 2010,
+          valor: 137887.25,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
 
-        { nome: "Sistema de movimentação aéreo com braço pantográfico para manipulação e transporte de vidros", 
-        ano: 2010, 
-        valor: 54125.00, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
+        {
+          nome: "Mesa de corte e processamento de barramentos para células",
+          ano: 2013,
+          valor: 9400.0,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
 
-        { nome: "Laminador de módulos fotovoltaicos", 
-        ano: 2010, 
-        valor: 349201.89, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
+        {
+          nome: "Mesas para posicionamento e movimentação de módulos fotovoltaicos",
+          ano: 2013,
+          valor: 20863.0,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
 
-        { nome: "Lavadora e secadora de vidros vertical AGMAQ", 
-        ano: 2010, 
-        valor: 86950.00, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
+        {
+          nome: "Sistema de movimentação aéreo com braço pantográfico para manipulação e transporte de vidros",
+          ano: 2010,
+          valor: 54125.0,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
 
-        { nome: "Câmara de caracterização de painéis fotovoltaicos com simulador solar por flash e imageamento por eletroluminescência", 
-        ano: 2010, 
-        valor: 134805.08, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
+        {
+          nome: "Laminador de módulos fotovoltaicos",
+          ano: 2010,
+          valor: 349201.89,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
 
-        { nome: "Estação de Trabalho", 
-        ano: null, 
-        valor: 4391.76, 
-        lab:"Lab. Aberto de Energia Fotovoltaica"},
+        {
+          nome: "Lavadora e secadora de vidros vertical AGMAQ",
+          ano: 2010,
+          valor: 86950.0,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
+
+        {
+          nome: "Câmara de caracterização de painéis fotovoltaicos com simulador solar por flash e imageamento por eletroluminescência",
+          ano: 2010,
+          valor: 134805.08,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
+
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. Aberto de Energia Fotovoltaica",
+        },
 
         //EQUIPAMENTOS LAEDAS
 
-        { nome: "DELL Optiplex 9020 - 8G RAM, Monitor, mausse e teclado", 
-        ano: 2013, 
-        valor: 3700.00, 
-        lab:"Lab. LAEDAS"}, 
-        
-        { nome: "Sun Ultra 40 M2- 16G RAM, Monitor, mausse e teclado", 
-        ano: 2009, 
-        valor: 5000.00, 
-        lab:"Lab. LAEDAS"},
+        {
+          nome: "DELL Optiplex 9020 - 8G RAM, Monitor, mausse e teclado",
+          ano: 2013,
+          valor: 3700.0,
+          lab: "Lab. LAEDAS",
+        },
 
-        { nome: "DELL Precision 3660 - 30G RAM, Monitor, mausse e teclado", 
-        ano: 2023, 
-        valor: 14000.00, 
-        lab:"Lab. LAEDAS"},
+        {
+          nome: "Sun Ultra 40 M2- 16G RAM, Monitor, mausse e teclado",
+          ano: 2009,
+          valor: 5000.0,
+          lab: "Lab. LAEDAS",
+        },
 
-        { nome: "Estação de Trabalho", ano: null, valor: 4391.76, lab:"Lab. LAEDAS"}
+        {
+          nome: "DELL Precision 3660 - 30G RAM, Monitor, mausse e teclado",
+          ano: 2023,
+          valor: 14000.0,
+          lab: "Lab. LAEDAS",
+        },
 
+        {
+          nome: "Estação de Trabalho",
+          ano: null,
+          valor: 4391.76,
+          lab: "Lab. LAEDAS",
+        },
 
-        
         // esses equipamentos não constam na lista da erica
-        // { nome: "Processamento térmico rápido (RTP) Allwin21 modelo AccuThermo AW 61", ano: 2011, valor: 170000.00, lab: ""},         
-        // { nome: "Potenciostato/Galvanostato Metrohn AG mdoelo Autolab PGSTAT302N", ano: 2008, valor: 120000.00, lab: ""},            
-        // { nome: "SISTEMA DE DEPOSICAO DE FILMES FINOS COM DUPLO PROCESSO DE DEPOSICAO", ano: null, valor: 2403270.00, lab:""},        
-        // { nome: "Medidor de Ângulo de Contato DataPhysics Instruments modelo OCA 15", ano: 2008, valor: 60000.00, lab:""},               
+        // { nome: "Processamento térmico rápido (RTP) Allwin21 modelo AccuThermo AW 61", ano: 2011, valor: 170000.00, lab: ""},
+        // { nome: "Potenciostato/Galvanostato Metrohn AG mdoelo Autolab PGSTAT302N", ano: 2008, valor: 120000.00, lab: ""},
+        // { nome: "SISTEMA DE DEPOSICAO DE FILMES FINOS COM DUPLO PROCESSO DE DEPOSICAO", ano: null, valor: 2403270.00, lab:""},
+        // { nome: "Medidor de Ângulo de Contato DataPhysics Instruments modelo OCA 15", ano: 2008, valor: 60000.00, lab:""},
         // { nome: "Perfilômetro Óptico Zygo modelo NewView 7300", ano: 2007, valor: 300000.00, lab:""},
         // { nome: "Difratômetro de Raios-X Rigaku modelo Ultima IV", ano: 2013, valor: 250000.00, lab:""},
         // { nome: "Espectrômetro de Fotoelétrons Excitados por Raios-X (XPS) Kratos modelo Axis Ultra DLD", ano: 2015, valor: 1200000.00, lab:""},
@@ -914,267 +1278,189 @@
         // { nome: "Máquina de inspeção ótica automática (AOI) Koh Young modelo YSi-M", ano: 2018, valor: 350000.00, lab:""},
         // { nome: "Máquina de inspeção ótica automática (AOI) Koh Young modelo YSi-L", ano: 2020, valor: 400000.00, lab:""},
         // { nome: "Estação de retrabalho para componentes BGA e QFN PACE modelo HotShot", ano: 2004, valor: 40000.00, lab:""},
-                
+      ];
 
-        
-    ];
+      // Objeto global para armazenar os valores capturados
+      let fatoresPlanilha = {
+        total_serv_supri: 0, // C5
+        area_total_construida: 0, // C9
+        percentual_areas_servi: 0, // C10
+        valor_m2_contru: 0, // C11
+        vida_util_predial: 0, // C12
+        percentual_manutencao_predial: 0, // C13
+        vida_util_horas_equipamentos: 0, // C14
+        horas_equipamentos_utilizada_anual: 0, // C15
+        percentual_equipamentos_manut_anual: 0, // C16
+      };
 
-    // Objeto global para armazenar os valores capturados
-let fatoresPlanilha = {
-    total_serv_supri: 0,      // C5
-    area_total_construida: 0,     // C9
-    percentual_areas_servi: 0,          // C10
-    valor_m2_contru: 0,             // C11
-    vida_util_predial: 0,              // C12
-    percentual_manutencao_predial: 0,           // C13
-    vida_util_horas_equipamentos: 0,          // C14
-    horas_equipamentos_utilizada_anual: 0,       // C15
-    percentual_equipamentos_manut_anual: 0          // C16
-};
+      async function carregarFatoresDaPlanilha() {
+        try {
+          // Busca os dados da rota que você acabou de testar no navegador
+          const response = await fetch("http://localhost:3000/api/parametros");
+          if (!response.ok)
+            throw new Error("Falha ao conectar com o servidor Node.js");
 
-// async function carregarFatoresDaPlanilha() {
-//     const urlCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTdREkUs2ivA0BtsFPtH_7t6RpMVXy_guhsFE7eFJrF0_PQ4eZ7HDShdtiGCCu4XQ/pub?gid=326379188&single=true&output=csv";    
-//     const urlProxy = `https://api.allorigins.win/get?url=${encodeURIComponent(urlCSV)}`;
-    
-//     try {
-//         const response = await fetch(urlProxy);
-//         if (!response.ok) throw new Error('Erro na rede');
-//         //recebe os dados em json
-//         const json = await response.json();
-//         const csvData = json.contents;
-//          if (!csvData) {
-//             throw new Error('Não foi possível ler os dados do proxy.');
-//         }
+          const dados = await response.json();
 
-//         //transforma o texto csv em linhas e colunas
-//         const linhas = csvData.split('\n').map(linha => linha.split(','));
+          // Alimenta o objeto global fatoresPlanilha com os dados do Excel
+          fatoresPlanilha = dados;
 
-//         const prepararNumero = (valor) => {
-//             if (!valor) return 0;
-//             // Remove R$, pontos de milhar e troca vírgula por ponto
-//             let limpo = valor.toString().replace(/[R$\s.]/g, '').replace(',', '.');
-//             return parseFloat(limpo) || 0;
-//         };
+          console.log("Dados sincronizados com o servidor:", fatoresPlanilha);
 
-//          /* Mapeamento das células:
-//            Índice da Linha = Número da linha na planilha - 1
-//            Índice da Coluna C = 2
-//         */
-//         fatoresPlanilha.total_serv_supri = prepararNumero(linhas[4][2]);             // C5
-//         fatoresPlanilha.area_total_construida = prepararNumero(linhas[8][2]);        // C9
-//         fatoresPlanilha.percentual_areas_servi = prepararNumero(linhas[9][2]);       // C10
-//         fatoresPlanilha.valor_m2_contru = prepararNumero(linhas[10][2]);             // C11
-//         fatoresPlanilha.vida_util_predial = prepararNumero(linhas[11][2]);           // C12
-//         fatoresPlanilha.percentual_manutencao_predial = prepararNumero(linhas[12][2]);// C13
-//         fatoresPlanilha.vida_util_horas_equipamentos = prepararNumero(linhas[13][2]);// C14
-//         fatoresPlanilha.horas_equipamentos_utilizada_anual = prepararNumero(linhas[14][2]); // C15
-//         fatoresPlanilha.percentual_equipamentos_manut_anual = prepararNumero(linhas[15][2]);// C16
-
-//         console.log("Dados carregados com sucesso!", fatoresPlanilha);
-
-//         alert("Conexão estabelecida!\nValor capturado (C11): R$ " + fatoresPlanilha.valor_m2_contru);
-        
-//     } catch (error) {
-//         console.error("Erro ao conectar com a planilha:", error);
-//         alert("Erro ao carregar dados da planilha. Verifique a conexão.");
-//     }
-// }
-
-// // Chame a função ao carregar a página para garantir que os dados estejam prontos
-// window.onload = carregarFatoresDaPlanilha;
-
-async function carregarFatoresDaPlanilha() {
-    try {
-        // Busca os dados da rota que você acabou de testar no navegador
-        const response = await fetch('http://localhost:3000/api/parametros');
-        if (!response.ok) throw new Error('Falha ao conectar com o servidor Node.js');
-        
-        const dados = await response.json();
-        
-        // Alimenta o objeto global fatoresPlanilha com os dados do Excel
-        fatoresPlanilha = dados;
-       
-
-        console.log("Dados sincronizados com o servidor:", fatoresPlanilha);
-        
-        // Um pequeno feedback visual para você confirmar que funcionou
-        
-    } catch (error) {
-        console.error("Erro na integração:", error);
-    }
-}
-window.onload = carregarFatoresDaPlanilha
-
-class ItemEquipamento {
-    constructor(equipOriginal) {
-        this.idUnico = 'equip_' + Date.now() + Math.floor(Math.random() * 1000);
-        this.nome = equipOriginal.nome;
-        this.lab = equipOriginal.lab;
-        this.valorOriginal = equipOriginal.valor;
-        this.horas = 0; // Campo que recebe o inteiro
-    }
-}
-
-
-   function selecionarTipo(tipo) {
-        tipoGlobal = tipo;
-        document.getElementById('etapa1').classList.add('hidden');
-        document.getElementById('formulario-dados').classList.remove('hidden');
-        document.getElementById('tipo-escolhido').innerText = tipo.toUpperCase();
-        
-        const campoProj = document.getElementById('campo-projeto');
-        const duracaoServ = document.getElementById('campo-duracao-servico');
-        const duracaoProj = document.getElementById('campo-duracao-projeto');
-
-        if (tipo === 'projetos') {
-            campoProj.classList.remove('hidden');
-            duracaoProj.classList.remove('hidden');
-            duracaoServ.classList.add('hidden');
-        } else {
-            campoProj.classList.add('hidden');
-            duracaoProj.classList.add('hidden');
-            duracaoServ.classList.remove('hidden');
+          // Um pequeno feedback visual para você confirmar que funcionou
+        } catch (error) {
+          console.error("Erro na integração:", error);
         }
-    }
+      }
+      window.onload = carregarFatoresDaPlanilha;
 
-    function adicionarLaboratorio() {
-        const select = document.getElementById('selLaboratorio');
+      class ItemEquipamento {
+        constructor(equipOriginal) {
+          this.idUnico =
+            "equip_" + Date.now() + Math.floor(Math.random() * 1000);
+          this.nome = equipOriginal.nome;
+          this.lab = equipOriginal.lab;
+          this.valorOriginal = equipOriginal.valor;
+          this.horas = 0; // Campo que recebe o inteiro
+        }
+      }
+
+      function selecionarTipo(tipo) {
+        tipoGlobal = tipo;
+        document.getElementById("etapa1").classList.add("hidden");
+        document.getElementById("formulario-dados").classList.remove("hidden");
+        document.getElementById("tipo-escolhido").innerText =
+          tipo.toUpperCase();
+
+        const campoProj = document.getElementById("campo-projeto");
+        const duracaoServ = document.getElementById("campo-duracao-servico");
+        const duracaoProj = document.getElementById("campo-duracao-projeto");
+
+        if (tipo === "projetos") {
+          campoProj.classList.remove("hidden");
+          duracaoProj.classList.remove("hidden");
+          duracaoServ.classList.add("hidden");
+        } else {
+          campoProj.classList.add("hidden");
+          duracaoProj.classList.add("hidden");
+          duracaoServ.classList.remove("hidden");
+        }
+      }
+
+      function adicionarLaboratorio() {
+        const select = document.getElementById("selLaboratorio");
         const idLab = select.value;
         const textoLab = select.options[select.selectedIndex].text;
-        const areaLab = parseFloat(select.options[select.selectedIndex].getAttribute('data-area'));
+        const areaLab = parseFloat(
+          select.options[select.selectedIndex].getAttribute("data-area"),
+        );
 
         if (idLab === "") {
-            alert("Selecione um laboratório!");
-            return;
+          alert("Selecione um laboratório!");
+          return;
         }
 
-        if (laboratoriosSelecionados.some(l => l.id === idLab)) {
-            alert("Laboratório já adicionado!");
-            return;
+        if (laboratoriosSelecionados.some((l) => l.id === idLab)) {
+          alert("Laboratório já adicionado!");
+          return;
         }
 
-        laboratoriosSelecionados.push({ id: idLab, nome: textoLab, area: areaLab });
+        laboratoriosSelecionados.push({
+          id: idLab,
+          nome: textoLab,
+          area: areaLab,
+        });
 
         // Atualiza a visualização da lista de labs
-        const containerLista = document.getElementById('area-labs-selecionados');
-        const divLista = document.getElementById('listaLabsWeb');
-        containerLista.classList.remove('hidden');
+        const containerLista = document.getElementById(
+          "area-labs-selecionados",
+        );
+        const divLista = document.getElementById("listaLabsWeb");
+        containerLista.classList.remove("hidden");
 
-        const item = document.createElement('div');
-        item.className = 'equip-item';
+        const item = document.createElement("div");
+        item.className = "equip-item";
         item.innerHTML = `<span>${textoLab} (${areaLab} m²)</span>`;
         divLista.appendChild(item);
 
-        // select.value = "";
-        
-        // // Atualiza a lista de equipamentos para mostrar apenas os dos labs selecionados
-        // atualizarSelectEquipamentos();
-        // --- NOVA LÓGICA ---
-    // Em vez de atualizar com tudo, passamos apenas o ID do laboratório atual
-    
-    focarEquipamentosDoLaboratorio(idLab);
-    
-    select.value = ""; // Limpa o select de laboratório para o próximo
+        focarEquipamentosDoLaboratorio(idLab);
 
-    }
+        select.value = ""; // Limpa o select de laboratório para o próximo
+      }
 
-    function focarEquipamentosDoLaboratorio(idLab) {
-    const selectEq = document.getElementById('selEquipamento');
-    selectEq.innerHTML = '<option value="">-- Selecione o Equipamento --</option>';
+      function focarEquipamentosDoLaboratorio(idLab) {
+        const selectEq = document.getElementById("selEquipamento");
+        selectEq.innerHTML =
+          '<option value="">-- Selecione o Equipamento --</option>';
 
-    // Filtra equipamentos APENAS do laboratório recém selecionado
-    const disponiveis = listaGeralEquipamentos.filter(eq => eq.lab === idLab);
+        // Filtra equipamentos APENAS do laboratório recém selecionado
+        const disponiveis = listaGeralEquipamentos.filter(
+          (eq) => eq.lab === idLab,
+        );
 
-    if (disponiveis.length === 0) {
-        selectEq.innerHTML = '<option value="">Nenhum equipamento cadastrado para este lab</option>';
-    }
-
-    disponiveis.forEach(eq => {
-        let opt = document.createElement('option');
-        opt.value = listaGeralEquipamentos.indexOf(eq);
-        opt.text = `${eq.nome} (${eq.ano || 'N/A'})`;
-        selectEq.add(opt);
-    });
-}
-
-function atualizarSomaEquipamentos() {
-    // Percorre a lista de objetos ItemEquipamento e soma a propriedade valorOriginal
-    somaTotalEquip = equipamentosSelecionados.reduce((acc, item) => acc + (item.valorOriginal || 0), 0);
-    
-    console.log("Valor total dos equipamentos utilizados: R$ " + somaTotalEquip.toFixed(2));
-}
-    // function atualizarSelectEquipamentos() {
-    //     const selectEq = document.getElementById('selEquipamento');
-    //     selectEq.innerHTML = '<option value="">-- Selecione o Equipamento --</option>';
-
-    //     // Filtra equipamentos que pertencem a qualquer um dos labs que o usuário já adicionou
-    //     const disponiveis = listaGeralEquipamentos.filter(eq => 
-    //         laboratoriosSelecionados.some(lab => lab.id === eq.lab)
-    //     );
-
-    //     if (disponiveis.length === 0) {
-    //         selectEq.innerHTML = '<option value="">Nenhum equipamento vinculado aos labs selecionados</option>';
-    //     }
-
-    //     disponiveis.forEach(eq => {
-    //         let opt = document.createElement('option');
-    //         // Guardamos o índice original para não quebrar a lógica de adição
-    //         opt.value = listaGeralEquipamentos.indexOf(eq);
-    //         opt.text = `${eq.nome} (${eq.ano || 'N/A'})`;
-    //         selectEq.add(opt);
-    //     });
-    // }
-
-    function adicionarEquipamento() {
-        const select = document.getElementById('selEquipamento');
-        const index = select.value;
-        
-        if (index === "") {
-            alert("Selecione um equipamento!");
-            return;
+        if (disponiveis.length === 0) {
+          selectEq.innerHTML =
+            '<option value="">Nenhum equipamento cadastrado para este lab</option>';
         }
 
-        // Cria um novo objeto da classe ItemEquipamento
+        disponiveis.forEach((eq) => {
+          let opt = document.createElement("option");
+          opt.value = listaGeralEquipamentos.indexOf(eq);
+          opt.text = `${eq.nome} (${eq.ano || "N/A"})`;
+          selectEq.add(opt);
+        });
+      }
+
+      function atualizarSomaEquipamentos() {
+        // Percorre a lista de objetos ItemEquipamento e soma a propriedade valorOriginal
+        somaTotalEquip = equipamentosSelecionados.reduce(
+          (acc, item) => acc + (item.valorOriginal || 0),
+          0,
+        );
+
+        console.log(
+          "Valor total dos equipamentos utilizados: R$ " +
+            somaTotalEquip.toFixed(2),
+        );
+      }
+
+      function adicionarEquipamento() {
+        const select = document.getElementById("selEquipamento");
+        const index = select.value;
+
+        if (index === "") {
+          alert("Selecione um equipamento!");
+          return;
+        }
+
         const novoItem = new ItemEquipamento(listaGeralEquipamentos[index]);
         equipamentosSelecionados.push(novoItem);
-        
-        //const containerLista = document.getElementById('area-selecionados');
-        //const divLista = document.getElementById('listaEquipsWeb');
-        //containerLista.classList.remove('hidden');
-        
-        //const item = document.createElement('div');
-        //item.className = 'equip-item';
-        //item.innerHTML = `<span>${equip.nome} <small>(${equip.lab})</small></span>`;
-        //divLista.appendChild(item);
 
-        // item.innerHTML = `<span>${equip.nome}</span>`;
-        // divLista.appendChild(item);
         renderizarListaEquipamentos();
         atualizarSomaEquipamentos();
         select.value = "";
-    }
+      }
 
+      function renderizarListaEquipamentos() {
+        const containerLista = document.getElementById("area-selecionados");
+        const divLista = document.getElementById("listaEquipsWeb");
 
-    function renderizarListaEquipamentos() {
-        const containerLista = document.getElementById('area-selecionados');
-        const divLista = document.getElementById('listaEquipsWeb');
-        
         if (equipamentosSelecionados.length === 0) {
-            containerLista.classList.add('hidden');
-            return;
+          containerLista.classList.add("hidden");
+          return;
         }
 
-        containerLista.classList.remove('hidden');
+        containerLista.classList.remove("hidden");
         divLista.innerHTML = ""; // Limpa para reconstruir a lista atualizada
 
         equipamentosSelecionados.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'equip-item';
-            div.style.padding = "10px";
-            div.style.marginBottom = "5px";
-            div.style.border = "1px solid #ddd";
+          const div = document.createElement("div");
+          div.className = "equip-item";
+          div.style.padding = "10px";
+          div.style.marginBottom = "5px";
+          div.style.border = "1px solid #ddd";
 
-            div.innerHTML = `
+          div.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span><strong>${item.nome}</strong> <small>(${item.lab})</small></span>
                     <button onclick="removerEquipamento('${item.idUnico}')" 
@@ -1183,53 +1469,53 @@ function atualizarSomaEquipamentos() {
                 <div style="margin-top: 8px;">
                     <label style="display: inline; font-size: 0.8rem;">Horas de uso:</label>
                     <input type="number" 
-                        value="${item.horas || ''}" 
+                        value="${item.horas || ""}" 
                         onchange="atualizarHoras('${item.idUnico}', this.value)"
                         placeholder="0" 
                         style="width: 70px; padding: 4px; margin-left: 5px;">
                 </div>
             `;
-            divLista.appendChild(div);
+          divLista.appendChild(div);
         });
-    }
+      }
 
-    function adicionarEquipamento() {
-    const select = document.getElementById('selEquipamento');
-    const index = select.value;
-    
-    if (index === "") {
-        alert("Selecione um equipamento!");
-        return;
-    }
+      function adicionarEquipamento() {
+        const select = document.getElementById("selEquipamento");
+        const index = select.value;
 
-    // Cria um novo objeto da classe ItemEquipamento
-    const novoItem = new ItemEquipamento(listaGeralEquipamentos[index]);
-    equipamentosSelecionados.push(novoItem);
-    
-    renderizarListaEquipamentos();
-    select.value = "";
-}
+        if (index === "") {
+          alert("Selecione um equipamento!");
+          return;
+        }
 
-function renderizarListaEquipamentos() {
-    const containerLista = document.getElementById('area-selecionados');
-    const divLista = document.getElementById('listaEquipsWeb');
-    
-    if (equipamentosSelecionados.length === 0) {
-        containerLista.classList.add('hidden');
-        return;
-    }
+        // Cria um novo objeto da classe ItemEquipamento
+        const novoItem = new ItemEquipamento(listaGeralEquipamentos[index]);
+        equipamentosSelecionados.push(novoItem);
 
-    containerLista.classList.remove('hidden');
-    divLista.innerHTML = ""; // Limpa para reconstruir a lista atualizada
+        renderizarListaEquipamentos();
+        select.value = "";
+      }
 
-    equipamentosSelecionados.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'equip-item';
-        div.style.padding = "10px";
-        div.style.marginBottom = "5px";
-        div.style.border = "1px solid #ddd";
+      function renderizarListaEquipamentos() {
+        const containerLista = document.getElementById("area-selecionados");
+        const divLista = document.getElementById("listaEquipsWeb");
 
-        div.innerHTML = `
+        if (equipamentosSelecionados.length === 0) {
+          containerLista.classList.add("hidden");
+          return;
+        }
+
+        containerLista.classList.remove("hidden");
+        divLista.innerHTML = ""; // Limpa para reconstruir a lista atualizada
+
+        equipamentosSelecionados.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className = "equip-item";
+          div.style.padding = "10px";
+          div.style.marginBottom = "5px";
+          div.style.border = "1px solid #ddd";
+
+          div.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span><strong>${item.nome}</strong> <small>(${item.lab})</small></span>
                 <button onclick="removerEquipamento('${item.idUnico}')" 
@@ -1238,157 +1524,215 @@ function renderizarListaEquipamentos() {
             <div style="margin-top: 8px;">
                 <label style="display: inline; font-size: 0.8rem;">Horas de uso:</label>
                 <input type="number" 
-                       value="${item.horas || ''}" 
+                       value="${item.horas || ""}" 
                        onchange="atualizarHoras('${item.idUnico}', this.value)"
                        placeholder="0" 
                        style="width: 70px; padding: 4px; margin-left: 5px;">
             </div>
         `;
-        divLista.appendChild(div);
-    });
-}
+          divLista.appendChild(div);
+        });
+      }
 
+      // Função para ALTERAR dinamicamente o valor dentro do objeto na lista
+      function atualizarHoras(id, valor) {
+        const item = equipamentosSelecionados.find((e) => e.idUnico === id);
+        if (item) {
+          item.horas = parseInt(valor) || 0;
+          // Sempre que mudar o valor de um item, recalcula o total
+          sincronizarSomaHoras();
+        }
+      }
 
+      // Função para EXCLUIR o item da lista
+      function removerEquipamento(id) {
+        equipamentosSelecionados = equipamentosSelecionados.filter(
+          (e) => e.idUnico !== id,
+        );
+        renderizarListaEquipamentos();
+        // Após remover, a soma deve diminuir automaticamente
+        sincronizarSomaHoras();
+        atualizarSomaEquipamentos();
+      }
 
-// Função para ALTERAR dinamicamente o valor dentro do objeto na lista
-function atualizarHoras(id, valor) {
-    const item = equipamentosSelecionados.find(e => e.idUnico === id);
-    if (item) {
-        item.horas = parseInt(valor) || 0;
-        // Sempre que mudar o valor de um item, recalcula o total
-        sincronizarSomaHoras(); 
-    }
-}
+      function sincronizarSomaHoras() {
+        // Soma as horas de todos os objetos da classe ItemEquipamento na lista
+        const somaTotalHoras = equipamentosSelecionados.reduce(
+          (acc, item) => acc + (item.horas || 0),
+          0,
+        );
 
-// Função para EXCLUIR o item da lista
-function removerEquipamento(id) {
-    equipamentosSelecionados = equipamentosSelecionados.filter(e => e.idUnico !== id);
-    renderizarListaEquipamentos();
-    // Após remover, a soma deve diminuir automaticamente
-    sincronizarSomaHoras(); 
-    atualizarSomaEquipamentos();
-}
+        // Localiza os inputs de ambas as calculadoras
+        const inputHoraServico = document.getElementById("horaServico");
+        const inputHoraEquipamentoProjeto =
+          document.getElementById("horaEquipamento");
 
-function sincronizarSomaHoras() {
-    // Soma as horas de todos os objetos da classe ItemEquipamento na lista
-    const somaTotalHoras = equipamentosSelecionados.reduce((acc, item) => acc + (item.horas || 0), 0);
-    
-    // Localiza os inputs de ambas as calculadoras
-    const inputHoraServico = document.getElementById('horaServico');
-    const inputHoraEquipamentoProjeto = document.getElementById('horaEquipamento');
-    
-    // Atualiza o campo da aba de Serviços
-    if (inputHoraServico) {
-        inputHoraServico.value = somaTotalHoras;
-    }
-    
-    // Atualiza o campo da aba de Projetos (Corrigido para id="horaEquipamento")
-    if (inputHoraEquipamentoProjeto) {
-        inputHoraEquipamentoProjeto.value = somaTotalHoras;
-    }
-    
-    console.log("Sincronização em tempo real concluída: " + somaTotalHoras + " horas totais.");
-}
+        // Atualiza o campo da aba de Serviços
+        if (inputHoraServico) {
+          inputHoraServico.value = somaTotalHoras;
+        }
 
-    function validarEGerar() {
-        const servidor = document.getElementById('nomeServidor').value.trim();
-        const divisao = document.getElementById('nomeDivisao').value.trim();
-        const projeto = document.getElementById('nomeProjeto').value.trim();
-        
-        if (!servidor || !divisao) { 
-            alert("Nome do Servidor e Divisão são obrigatórios!"); 
-            return; 
+        // Atualiza o campo da aba de Projetos (Corrigido para id="horaEquipamento")
+        if (inputHoraEquipamentoProjeto) {
+          inputHoraEquipamentoProjeto.value = somaTotalHoras;
+        }
+
+        console.log(
+          "Sincronização em tempo real concluída: " +
+            somaTotalHoras +
+            " horas totais.",
+        );
+      }
+
+      function validarEGerar() {
+        const servidor = document.getElementById("nomeServidor").value.trim();
+        const divisao = document.getElementById("nomeDivisao").value.trim();
+        const projeto = document.getElementById("nomeProjeto").value.trim();
+
+        if (!servidor || !divisao) {
+          alert("Nome do Servidor e Divisão são obrigatórios!");
+          return;
         }
 
         if (laboratoriosSelecionados.length === 0) {
-            alert("Adicione pelo menos um laboratório!");
-            return;
+          alert("Adicione pelo menos um laboratório!");
+          return;
         }
 
         if (equipamentosSelecionados.length === 0) {
-            alert("É obrigatório incluir pelo menos 1 equipamento!"); 
-            return;
+          alert("É obrigatório incluir pelo menos 1 equipamento!");
+          return;
         }
 
-        let areaTotalM2 = laboratoriosSelecionados.reduce((acc, lab) => acc + lab.area, 0);
-        let depPredial = 0, consPredial = 0, servicoSuprimentos = 0, duracaoTexto = "";
-        let depEquip = 0, manEquip = 0, duracaoTextoEquip = ""; 
+        let areaTotalM2 = laboratoriosSelecionados.reduce(
+          (acc, lab) => acc + lab.area,
+          0,
+        );
+        let depPredial = 0,
+          consPredial = 0,
+          servicoSuprimentos = 0,
+          duracaoTexto = "";
+        let depEquip = 0,
+          manEquip = 0,
+          duracaoTextoEquip = "";
 
-        let consMensal = fatoresPlanilha.valor_m2_contru *(fatoresPlanilha.percentual_areas_servi+1)/ (fatoresPlanilha.vida_util_predial *12);
+        let consMensal =
+          (fatoresPlanilha.valor_m2_contru *
+            (fatoresPlanilha.percentual_areas_servi + 1)) /
+          (fatoresPlanilha.vida_util_predial * 12);
 
-        let depMensal = fatoresPlanilha.valor_m2_contru *(fatoresPlanilha.percentual_areas_servi+1)/ (fatoresPlanilha.vida_util_predial *12);
-        
+        let depMensal =
+          (fatoresPlanilha.valor_m2_contru *
+            (fatoresPlanilha.percentual_areas_servi + 1)) /
+          (fatoresPlanilha.vida_util_predial * 12);
 
-        if (tipoGlobal === 'serviços') {
-            const horaServico = parseFloat(document.getElementById('horaServico').value);
-            if (isNaN(horaServico) || horaServico <= 0) { alert("Informe as horas!"); return; }
+        if (tipoGlobal === "serviços") {
+          const horaServico = parseFloat(
+            document.getElementById("horaServico").value,
+          );
+          if (isNaN(horaServico) || horaServico <= 0) {
+            alert("Informe as horas!");
+            return;
+          }
 
-            depPredial = areaTotalM2 * (depMensal/200) * horaServico;
-            consPredial = areaTotalM2 * (consMensal/200) * horaServico;
-            servicoSuprimentos = areaTotalM2 * (0.005*horaServico) * (1+fatoresPlanilha.percentual_areas_servi)* fatoresPlanilha.total_serv_supri/fatoresPlanilha.area_total_construida /12; 
-            depEquip= (1/fatoresPlanilha.vida_util_horas_equipamentos)* horaServico * somaTotalEquip
-            
-            duracaoTexto = horaServico + " horas";
-            
+          depPredial = areaTotalM2 * (depMensal / 200) * horaServico;
+          consPredial = areaTotalM2 * (consMensal / 200) * horaServico;
+          servicoSuprimentos =
+            (areaTotalM2 *
+              (0.005 * horaServico) *
+              (1 + fatoresPlanilha.percentual_areas_servi) *
+              fatoresPlanilha.total_serv_supri) /
+            fatoresPlanilha.area_total_construida /
+            12;
+          depEquip =
+            (1 / fatoresPlanilha.vida_util_horas_equipamentos) *
+            horaServico *
+            somaTotalEquip;
+
+          duracaoTexto = horaServico + " horas";
         } else {
+          if (!projeto) {
+            alert("O nome do Projeto é obrigatório!");
+            return;
+          }
+          const mesesProjeto = parseFloat(
+            document.getElementById("mesesProjeto").value,
+          );
+          const totalHorasEquip =
+            parseFloat(document.getElementById("horaEquipamento").value) || 0;
+          if (isNaN(mesesProjeto) || mesesProjeto <= 0) {
+            alert("Informe os meses!");
+            return;
+          }
 
-            if (!projeto) { alert("O nome do Projeto é obrigatório!"); return; }
-            const mesesProjeto = parseFloat(document.getElementById('mesesProjeto').value);
-            const totalHorasEquip = parseFloat(document.getElementById('horaEquipamento').value) || 0;
-            if (isNaN(mesesProjeto) || mesesProjeto <= 0) { alert("Informe os meses!"); return; }
-            
-            
-            depPredial = areaTotalM2 * depMensal * mesesProjeto
-        
+          depPredial = areaTotalM2 * depMensal * mesesProjeto;
 
-            consPredial = areaTotalM2 * consMensal * mesesProjeto;
+          consPredial = areaTotalM2 * consMensal * mesesProjeto;
 
-            //usando a planilha para calcular serviço e suprimentos, multiplicando o valor por m2 e duração em meses
-            servicoSuprimentos = areaTotalM2 * mesesProjeto * (1+fatoresPlanilha.percentual_areas_servi)* fatoresPlanilha.total_serv_supri/fatoresPlanilha.area_total_construida /12; 
-            
-            depEquip = (1 / fatoresPlanilha.vida_util_horas_equipamentos) * totalHorasEquip * somaTotalEquip;
+          //usando a planilha para calcular serviço e suprimentos, multiplicando o valor por m2 e duração em meses
+          servicoSuprimentos =
+            (areaTotalM2 *
+              mesesProjeto *
+              (1 + fatoresPlanilha.percentual_areas_servi) *
+              fatoresPlanilha.total_serv_supri) /
+            fatoresPlanilha.area_total_construida /
+            12;
 
-            duracaoTexto = mesesProjeto + " meses";
+          depEquip =
+            (1 / fatoresPlanilha.vida_util_horas_equipamentos) *
+            totalHorasEquip *
+            somaTotalEquip;
+
+          duracaoTexto = mesesProjeto + " meses";
         }
 
         // Preencher relatório
-        document.getElementById('res-servidor').innerText = servidor;
-        document.getElementById('res-tipo').innerText = tipoGlobal.toUpperCase();
-        document.getElementById('res-divisao').innerText = divisao;
-        document.getElementById('res-duracao').innerText = duracaoTexto;
-        document.getElementById('res-area').innerText = areaTotalM2.toFixed(2);
-        
-        const listaResLab = document.getElementById('res-lista-laboratorios');
+        document.getElementById("res-servidor").innerText = servidor;
+        document.getElementById("res-tipo").innerText =
+          tipoGlobal.toUpperCase();
+        document.getElementById("res-divisao").innerText = divisao;
+        document.getElementById("res-duracao").innerText = duracaoTexto;
+        document.getElementById("res-area").innerText = areaTotalM2.toFixed(2);
+
+        const listaResLab = document.getElementById("res-lista-laboratorios");
         listaResLab.innerHTML = "";
-        laboratoriosSelecionados.forEach(lab => {
-            const li = document.createElement('li');
-            li.innerText = `${lab.nome} (${lab.area.toFixed(2)} m²)`;
-            listaResLab.appendChild(li);
+        laboratoriosSelecionados.forEach((lab) => {
+          const li = document.createElement("li");
+          li.innerText = `${lab.nome} (${lab.area.toFixed(2)} m²)`;
+          listaResLab.appendChild(li);
         });
 
-        const listaResEq = document.getElementById('res-lista-equipamentos');
+        const listaResEq = document.getElementById("res-lista-equipamentos");
         listaResEq.innerHTML = "";
-        equipamentosSelecionados.forEach(eq => {
-            const li = document.createElement('li');
-            li.innerText = `${eq.nome} (${eq.ano || 'N/A'})`;
-            listaResEq.appendChild(li);
+        equipamentosSelecionados.forEach((eq) => {
+          const li = document.createElement("li");
+          li.innerText = `${eq.nome} (${eq.ano || "N/A"})`;
+          listaResEq.appendChild(li);
         });
 
-        const f = (n) => n.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('res-dep').innerText = f(depPredial);
-        document.getElementById('res-cons').innerText = f(consPredial);
-        document.getElementById('res-suprimentos').innerText = f(servicoSuprimentos);
-        document.getElementById('res-dep-equip').innerText = f(depEquip);
-        document.getElementById('res-man-equip').innerText = f(manEquip);
-        
-        document.getElementById('data-geracao').innerText = new Date().toLocaleString('pt-BR');
-        document.getElementById('res-projeto-linha').style.display = (tipoGlobal === 'projetos') ? 'block' : 'none';
-        if (tipoGlobal === 'projetos') document.getElementById('res-projeto').innerText = projeto;
+        const f = (n) =>
+          n.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        document.getElementById("res-dep").innerText = f(depPredial);
+        document.getElementById("res-cons").innerText = f(consPredial);
+        document.getElementById("res-suprimentos").innerText =
+          f(servicoSuprimentos);
+        document.getElementById("res-dep-equip").innerText = f(depEquip);
+        document.getElementById("res-man-equip").innerText = f(manEquip);
 
-        document.getElementById('formulario-dados').classList.add('hidden');
-        document.getElementById('relatorio-final').classList.remove('hidden');
+        document.getElementById("data-geracao").innerText =
+          new Date().toLocaleString("pt-BR");
+        document.getElementById("res-projeto-linha").style.display =
+          tipoGlobal === "projetos" ? "block" : "none";
+        if (tipoGlobal === "projetos")
+          document.getElementById("res-projeto").innerText = projeto;
+
+        document.getElementById("formulario-dados").classList.add("hidden");
+        document.getElementById("relatorio-final").classList.remove("hidden");
         //teste de seleção aprovada.
-    }
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>
