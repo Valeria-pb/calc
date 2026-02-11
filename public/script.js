@@ -263,7 +263,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. de Caracterização Espectroscópica",
         },
@@ -383,7 +383,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: "",
           valor: 4391.76,
           lab: "Lab. de Fotônica",
         },
@@ -433,7 +433,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. de Biotecnologia",
         },
@@ -533,7 +533,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. DIPAQ",
         },
@@ -612,7 +612,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. de Micro e Nanofabricação",
         },
@@ -733,7 +733,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. Aberto de Empacotamento e Integração de Sistemas",
         },
@@ -840,7 +840,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. Aberto de Impressão 3D",
         },
@@ -897,7 +897,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. Aberto de Energia Fotovoltaica",
         },
@@ -927,7 +927,7 @@ let tipoGlobal = "";
 
         {
           nome: "Estação de Trabalho",
-          ano: null,
+          ano: " ",
           valor: 4391.76,
           lab: "Lab. LAEDAS",
         },
