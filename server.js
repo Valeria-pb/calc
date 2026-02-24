@@ -44,7 +44,9 @@ app.get('/api/parametros', (req, res) => {
             percentual_manutencao_predial: preparar(dados[7] ? dados[7][0] : 0), // A8
             vida_util_horas_equipamentos: preparar(dados[8] ? dados[8][0] : 0), // A9
             horas_equipamentos_utilizada_anual: preparar(dados[9] ? dados[9][0] : 0), // A10
-            percentual_equipamentos_manut_anual: preparar(dados[10] ? dados[10][0] : 0) // A11
+            percentual_equipamentos_manut_anual: preparar(dados[10] ? dados[10][0] : 0), // A11
+            valor_hora_pessoal_nivel_superior: preparar(dados[11] ? dados[11][0] : 0), // A12
+            valor_hora_pessoal_nivel_medio: preparar(dados[12] ? dados[12][0] : 0) // A13
         };
 
         // Retorna o objeto organizado para o seu HTML

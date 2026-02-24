@@ -968,6 +968,8 @@ let tipoGlobal = "";
         vida_util_horas_equipamentos: 0, // C14
         horas_equipamentos_utilizada_anual: 0, // C15
         percentual_equipamentos_manut_anual: 0, // C16
+        valor_hora_pessoal_nivel_superior: 0, // C17
+        valor_hora_pessoal_nivel_medio: 0, // C18
       };
 
       async function carregarFatoresDaPlanilha() {
@@ -1039,6 +1041,11 @@ let tipoGlobal = "";
 
         if (laboratoriosSelecionados.some((l) => l.id === idLab)) {
           alert("Laboratório já adicionado!");
+          return;
+        }
+
+        if (horasSuperior < 0 || horasIntermediario < 0) {
+          alert("As horas de pessoal não podem ser valores negativos!");
           return;
         }
 
@@ -1210,6 +1217,9 @@ let tipoGlobal = "";
         const servidor = document.getElementById("nomeServidor").value.trim();
         const divisao = document.getElementById("nomeDivisao").value.trim();
         const projeto = document.getElementById("nomeProjeto").value.trim();
+        const horasSuperior = parseFloat(document.getElementById("horasSuperior").value) || 0;
+        const horasIntermediario = parseFloat(document.getElementById("horasIntermediario").value) || 0;
+        const custoRH = (horasSuperior * fatoresPlanilha.valor_hora_pessoal_nivel_superior) + (horasIntermediario * fatoresPlanilha.valor_hora_pessoal_nivel_medio);
 
         if (!servidor || !divisao) {
           alert("Nome do Servidor e Divisão são obrigatórios!");
@@ -1317,6 +1327,9 @@ let tipoGlobal = "";
         document.getElementById("res-divisao").innerText = divisao;
         document.getElementById("res-duracao").innerText = duracaoTexto;
         document.getElementById("res-area").innerText = areaTotalM2.toFixed(2);
+        // Preenche os novos campos de horas no relatório
+        document.getElementById("res-horas-sup").innerText = horasSuperior;
+        document.getElementById("res-horas-int").innerText = horasIntermediario;
 
         const listaResLab = document.getElementById("res-lista-laboratorios");
         listaResLab.innerHTML = "";
@@ -1339,6 +1352,8 @@ let tipoGlobal = "";
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           });
+
+        document.getElementById("somaHorasPessoal").innerText = f(custoRH);
         document.getElementById("res-dep").innerText = f(depPredial);
         document.getElementById("res-cons").innerText = f(consPredial);
         document.getElementById("res-suprimentos").innerText =
@@ -1355,5 +1370,11 @@ let tipoGlobal = "";
 
         document.getElementById("formulario-dados").classList.add("hidden");
         document.getElementById("relatorio-final").classList.remove("hidden");
-        //teste de seleção aprovada.
+             
+      }
+      function voltarParaEdicao() {
+    // Esconde o relatório
+    document.getElementById("relatorio-final").classList.add("hidden");
+    // Mostra o formulário com os dados preservados
+    document.getElementById("formulario-dados").classList.remove("hidden");
       }

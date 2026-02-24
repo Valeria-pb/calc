@@ -243,6 +243,24 @@
           />
         </div>
 
+        <div class="row-pessoal">
+    <div class="col-pessoal">
+        <label for="horasSuperior">Total Horas Nível Superior:</label>
+        <input type="number" id="horasSuperior" placeholder="Ex: 40" min="0">
+    </div>
+    <div class="col-pessoal">
+        <label for="horasIntermediario">Total Horas Nível Médio/Interm.:</label>
+        <input type="number" id="horasIntermediario" placeholder="Ex: 20" min="0">
+    </div>
+    <!-- <div class="valor-pessoal">
+        <label for="horasIntermediario">Total Horas Nível Médio/Interm.:</label>
+        <input type="number" id="horasIntermediario" placeholder="Ex: 20" min="0">
+    </div> -->
+
+
+
+</div>
+
         <button class="btn-proximo" onclick="validarEGerar()">
           Gerar Relatório
         </button>
@@ -268,7 +286,15 @@
         <p><strong>Equipamentos Utilizados:</strong></p>
         <ul id="res-lista-equipamentos" style="font-size: 0.9rem"></ul>
 
-        <p><strong>Duração:</strong> <span id="res-duracao"></span></p>
+        <p>Total Horas Nível Superior: <span id="res-horas-sup"></span>h</p>
+
+        <p>Total Horas Nível Médio/Interm.:<span id="res-horas-int"></span>h</p>
+
+        <!-- NÃO ESQUECER DE FAZER AQUI O CÁLCULO DO VALOR DE RECURSOS HUMANOS E COLOCAR NO RELATÓRIO -->
+
+        <p><strong>Valor de recursos Humanos:</strong> R$ <span id= "somaHorasPessoal"></span></p>
+
+        <p><strong>Duração de uso dos equipamentos:</strong> <span id="res-duracao"></span></p>
 
         <div
           style="
@@ -307,9 +333,15 @@
         <p style="font-size: 0.8rem; color: #666">
           Gerado em: <span id="data-geracao"></span>
         </p>
+        <!-- //onclick="window.print()" -->
+        <button class="no-print" 
+        style="background: #f39c12; margin-top: 10px; margin-right: 5px; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="voltarParaEdicao()">
+    Voltar e Editar
+</button>
         <button class="btn-pdf no-print" onclick="window.print()">
           Salvar como PDF
         </button>
+
         <button
           class="no-print"
           style="background: #666; margin-top: 10px"
@@ -318,6 +350,7 @@
           Novo Cálculo
         </button>
       </div>
+      
     </div>
 
     <script src="script.js"></script>

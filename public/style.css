@@ -179,3 +179,14 @@ button:hover {
     .container { border: none; box-shadow: none; width: 100%; max-width: 100%; margin: 0; }
     #relatorio-final { display: block !important; border: 1px solid #ccc; padding: 0; }
 }
+
+.row-pessoal {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.col-pessoal {
+    flex: 1;
+}
+
